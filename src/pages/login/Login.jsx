@@ -1,0 +1,112 @@
+import React, { useState, useContext } from 'react';
+import { TypeAnimation } from 'react-type-animation';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../utils/AuthContext';
+import { useMutation } from 'react-query';
+import { userLogin } from '../../api/users';
+
+export default function Login() {
+  const [userContext, setUserContext] = useContext(AuthContext);
+  const [userData, setUserData] = useState({});
+  const [ error, setError ] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) =>{
+      const { name, value } = e.target
+      setUserData( prevData => ({
+          ...prevData,
+          [name]:value
+      }));
+  }
+  
+  const userLoginMutation = useMutation(userLogin, {
+      onSuccess: (res) => {
+        console.log(res);
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("account", res.data.account);
+        localStorage.setItem("id", res.data.id);
+        localStorage.setItem("username", res.data.username);
+
+        setUserContext( prev =>{
+          return{ ...prev, 
+              account : res.data.account,
+              id : res.data.id,
+              accessToken : res.data.accessToken,
+              username : res.data.username,
+          }
+        })
+        navigate("/homepage")
+        // navigate(`/project/1/kanban`)
+      },
+      onError: (err) => {
+        console.log(err);
+        setError("帳號或密碼錯誤")
+      }
+  })
+
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    userLoginMutation.mutate(userData)
+  } 
+
+  return (
+    <section className="flex flex-col md:flex-row h-screen items-center">
+      <div className="hidden bg-white w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
+        <div className='flex flex-col'>
+          <h1 className='mx-auto  text-7xl mb-2'>自主學習</h1>
+          <img src='images/login.png' width={'600px'} alt='I am B' />
+          {/* <TypeAnimation
+            className='text-2xl font-press-start mt-2 '
+            sequence={[
+              'self-directed Learning', 
+              2000,
+              'science inquery',
+              2000, 
+              'NCU Wulab',
+              2000,
+            ]}
+            speed={40}
+            wrapper="span"
+            cursor={true}
+            repeat={Infinity}
+            style={{ fontSize: '2em', display: 'inline-block' }}
+            />      */}
+          {/* <h1 className='text-white text-2xl font-press-start mt-2'>self-directed Learning</h1>  */}
+        </div>
+      </div>
+      <div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-16 xl:pr-80 flex items-center justify-center">
+        <div className="bg-white w-full h-100 rounded-lg p-8 shadow-2xl">
+          <h1 className="text-lg font-bold mb-6 flex items-center justify-center">Welcome to <span style= { {color:"#5BA491" } } className="ml-2"> SDLP</span></h1>
+          <h1 className="text-4xl font-bold mb-6 flex items-center justify-center">Sign in</h1>
+            {/* <button type="button" className="w-full block bg-white hover:bg-gray-100 focus:bg-gray-100 text-gray-900 font-semibold rounded-lg px-4 py-3 border-2 border-customgreen">
+              <div className="flex items-center justify-center">
+                  <span className="ml-4 ">Login with Wulab</span>
+              </div>
+            </button>
+          <hr className="my-6 border-gray-300 w-full" /> */}
+          <form className="mt-6">
+            <div>
+              <label className="block text-gray-700 text-base">帳號</label>
+              <input type="text" name="account" placeholder="請輸入帳號" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-green-700 focus:bg-white focus:outline-none" autoFocus required />
+            </div>
+            <div className="mt-4">
+              <label className="block text-gray-700 text-base">密碼</label>
+              <input type="password" name="password" placeholder="請輸入密碼" minLength="6" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-green-700 focus:bg-white focus:outline-none" required />
+              {error && <span className=' text-xs text-red-600'>{error}</span>}
+            </div>
+            {/* <p className='text-gray-400 bg-white flex items-center justify-center'><hr className="my-6 border-gray-300 w-1/2" />or<hr className="my-6 border-gray-300 w-1/2" /></p>
+            <button className=''><button className=''><button className=''>Google</button>FB</button>Apple</button> */}
+
+            <button type="submit" onClick={handleSubmit} style= { {backgroundColor:"#5BA491" } } className="w-full block hover:bg-violet-400 focus:bg-violet-400 text-white font-semibold rounded-lg px-4 py-3 mt-6 text-base">登入</button>
+          </form>
+          <p className="mt-8 text-gray-400">
+            還沒有帳號? 
+            <span style= { {color:"#5BA491" } } className="text-blue-500 hover:text-blue-700 font-semibold ml-2">
+              <Link to="/register">Sign up</Link> 
+            </span>
+          </p>
+        </div>
+      </div>
+  </section>
+  )
+}
