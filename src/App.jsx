@@ -43,13 +43,13 @@ export default function App() {
           </Route>
         </Route>
         <Route path="*" element={<NotFound />}></Route>
-      </Route>  
+      </Route>
     )
   )
 
-  return ( 
+  return (
     <AuthProvider>
-      <RouterProvider router={router}/>
+      <RouterProvider router={router} />
     </AuthProvider>
   )
 }

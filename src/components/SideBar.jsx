@@ -31,8 +31,27 @@ export default function SideBar() {
         { name: "調節", index: 4 },
         { name: "歷程", index: 5 }
     ];
-    const getStageColor = (stageIndex) => parseInt(currentStage) === stageIndex ? '#5BA491' : '#BEBEBE';
-    const getTextColor = (stageIndex) => parseInt(currentStage) === stageIndex ? 'text-white' : 'text-slate-700';
+    // const getStageColor = (stageIndex) => parseInt(currentStage) === stageIndex ? '#5BA491' : '#BEBEBE';
+    const getStageColor = (stageIndex) => {
+        if (parseInt(currentStage) === stageIndex) {
+            return '#5BA491'; // 当前阶段
+        } else if (stageIndex < parseInt(currentStage)) {
+            return '#7C968F'; // 小于当前阶段的阶段
+        } else {
+            return '#BEBEBE'; // 其他阶段
+        }
+    };
+    // const getTextColor = (stageIndex) => parseInt(currentStage) === stageIndex ? 'text-white' : 'text-slate-700';
+    const getTextColor = (stageIndex) => {
+        if (parseInt(currentStage) === stageIndex) {
+            return 'text-white'; // 当前阶段
+        } else if (stageIndex < parseInt(currentStage)) {
+            return 'text-slate-200'; // 小于当前阶段的阶段
+        } else {
+            return 'text-slate-700'; // 其他阶段
+        }
+    };
+
 
     // const getSubStageQuery = useQuery("getSubStage", () => getSubStage({
     //     projectId: projectId,
@@ -103,7 +122,7 @@ export default function SideBar() {
                                 <h2 style={{ transitionDelay: "700ms", }} className={`whitespace-pre text-sm duration-500 ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
                                     聊天室
                                 </h2>
-                                <h2 className={`${open && 'hidden'} absolute left-14 bg-white font-semibold text-sm whitespace-pre rounded-md drop-shadow-lg p-0 w-0  overflow-hidden group-hover:p-1  group-hover:w-fit text-white`}>
+                                <h2 className={`${open && 'hidden'} absolute left-14 bg-white font-semibold text-sm whitespace-pre rounded-md drop-shadow-lg p-0 w-0  overflow-hidden `}>
                                     聊天室
                                 </h2>
                             </span>

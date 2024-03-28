@@ -9,6 +9,7 @@ import { FaPlus } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable as Droppable } from '../../utils/StrictModeDroppable';
+import SubStageComponent from '../../components/SubStageBar'; 
 
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getKanbanColumns, getKanbanTasks, addCardItem } from '../../api/kanban';
@@ -165,7 +166,7 @@ export default function Kanban() {
 
         try {
           const updatedKanbanData = await getKanbanColumns(projectId);
-          console.log("updatedKanbanData:",updatedKanbanData)
+          console.log("updatedKanbanData:", updatedKanbanData)
           setKanbanData(updatedKanbanData); // 使用最新数据更新状态
         } catch (error) {
           console.error("获取看板列数据失败:", error);
@@ -174,12 +175,7 @@ export default function Kanban() {
         setNewGroupName('');
         setShowAddGroupInput(false);
       });
-      // getKanbanColumns(projectId),
-      // {
-      //   onSuccess: setKanbanData
-      // }
-      // setNewGroupName('');
-      // setShowAddGroupInput(false); // 新增列表後隱藏輸入框
+
       console.log(kanbanData)
     }
   };
@@ -334,12 +330,7 @@ export default function Kanban() {
                                       新增卡片
                                     </button>
                                   </div>
-                                  // <button
-                                  //   className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
 
-                                  // >
-                                  //   <FiPlus className="w-5 h-5" />
-                                  // </button>
                                 )
                               }
 
@@ -354,6 +345,13 @@ export default function Kanban() {
           </Droppable>
         </DragDropContext >
       </div>
+      {/* <div className="stage-info-container flex justify-center my-4">
+        <div className="flex flex-col items-center justify-center bg-gray-200 rounded-lg p-4 m-2">
+          <p className="text-lg font-semibold">{stageInfo.name}</p>
+        </div>
+      </div> */}
+      
+      {/* <SubStageComponent /> */}
     </div >
   )
 }
