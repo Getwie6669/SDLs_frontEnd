@@ -125,34 +125,37 @@ export default function Reflection() {
     const sucesssNotify = (toastContent) => toast.success(toastContent);
     return (
         <div className='min-w-full min-h-screen h-screen'>
-            <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-start'>
+            <div className='flex flex-col my-5 pl-20 pr-5 py-16 w-full h-screen justify-start items-start'>
                 <div className='flex justify-start gap-6 items-center w-full'>
                     <h3 className='text-lg font-bold'>個人日誌</h3>
                     <button onClick={() => setPersonalDailyModalOpen(true)} className="flex items-center bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-lg p-1 mr-1 sm:px-4 text-base min-w-[70px]">
-                        <FaPlus/>
+                        <FaPlus />
                         <p className="ml-2">新增</p>
                     </button>
                 </div>
-                <hr className='w-full h-[3px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' />
+                {/* <hr className='w-full h-[3px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' /> */}
                 <div className='flex flex-wrap justify-start items-center w-full mb-5'>
-                    {
-                        isLoading ? <Loader /> :
-                            isError ? <p className=' text-base font-bold'>{error.message}</p> :
-                                personalDaily.map((item, index) => {
-                                    console.log(item);
-                                    return (
-                                        <div className='flex mb-3 flex-col items-center bg-white rounded-lg shadow-xl mr-5' key={index}>
-                                            <button onClick={() => {
-                                                setInspectDailyModalOpen(true);
-                                                setSelectedDaily(item)
-                                            }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
-                                                <img src="/refDaily.jpg" alt="Daily Thumbnail" className="w-64 h-44 rounded-t-lg pb-2" />
-                                                {item.title}
-                                            </button>
-                                        </div>
-                                    )
-                                })
-                    }
+                    <div className='flex overflow-x-auto py-2 scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
+                        {
+                            isLoading ? <Loader /> :
+                                isError ? <p className='text-base font-bold'>{error.message}</p> :
+                                    personalDaily.map((item, index) => {
+                                        console.log(item);
+                                        return (
+                                            <div className='flex-none mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
+                                                <button onClick={() => {
+                                                    setInspectDailyModalOpen(true);
+                                                    setSelectedDaily(item)
+                                                }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
+                                                    <img src="/refDaily.jpg" alt="Daily Thumbnail" className="w-64 h-44 rounded-t-lg pb-2" />
+                                                    {item.title}
+                                                </button>
+                                            </div>
+                                        )
+                                    })
+                        }
+                    </div>
+
                 </div>
                 <div className='flex justify-start gap-6 items-center w-full'>
                     <h3 className='text-lg font-bold'>小組日誌</h3>
@@ -163,32 +166,34 @@ export default function Reflection() {
                             type: "discuss"
                         }))
                     }} className="flex items-center bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-lg p-1 mr-1 sm:px-4 text-base min-w-[70px]">
-                        <FaPlus/>
+                        <FaPlus />
                         <p className="ml-2">新增</p>
                     </button>
                 </div>
 
-                <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' />
+                {/* <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' /> */}
                 <div className='  flex flex-wrap justify-start items-center w-full mb-5'>
-                    {
-                        teamDailyQuery.isLoading ? <Loader /> :
-                            teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
-                                teamDaily.map((item, index) => {
-                                    if (item.type === "discuss") {
-                                        return (
-                                            <div className='flex mb-3 flex-col items-center bg-white rounded-lg shadow-xl mr-5' key={index}>
-                                            <button onClick={() => {
-                                                setInspectDailyModalOpen(true);
-                                                setSelectedDaily(item)
-                                            }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
-                                                <img src="/note.jpg" alt="Daily Thumbnail" className=" w-64 h-44 rounded-t-lg pb-2" />
-                                                {item.title}
-                                            </button>
-                                        </div>
-                                        )
-                                    } else return
-                                })
-                    }
+                    <div className='flex overflow-x-auto py-2 scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
+                        {
+                            teamDailyQuery.isLoading ? <Loader /> :
+                                teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
+                                    teamDaily.map((item, index) => {
+                                        if (item.type === "discuss") {
+                                            return (
+                                                <div className='flex mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
+                                                    <button onClick={() => {
+                                                        setInspectDailyModalOpen(true);
+                                                        setSelectedDaily(item)
+                                                    }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
+                                                        <img src="/note.jpg" alt="Daily Thumbnail" className=" w-64 h-44 rounded-t-lg pb-2" />
+                                                        {item.title}
+                                                    </button>
+                                                </div>
+                                            )
+                                        } else return
+                                    })
+                        }
+                    </div>
                 </div>
             </div>
 

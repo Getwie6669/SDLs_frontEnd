@@ -159,7 +159,7 @@ export default function HomePage() {
 
 
     <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
-      <SideBar />
+      {/* <SideBar /> */}
       <TopBar />
       
       <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-center'>

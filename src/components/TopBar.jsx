@@ -48,7 +48,9 @@ export default function TopBar() {
     // <div className='fixed  h-16 w-full pl-20 bg-[#FFFFFF] flex items-center justify-between pr-5 border-b-2'>
     <div className='fixed  h-16 w-full bg-[#FFFFFF] flex items-center justify-between pr-5 border-b-2'>
       <Link to="/homepage" onClick={cleanStage} className="flex px-5 items-center font-bold font-Mulish text-2xl">
-        sdls
+        {/* <img src="/logo.ico" alt="Logo" className="mr-2" /> */}
+        <img src="/SDLS_LOGOO.jpg" alt="Logo" className=" h-14 w-auto" />
+        
       </Link>
       <div className="flex items-center">
         <ul className="flex items-center justify-center space-x-1">
