@@ -68,15 +68,15 @@ export default function Carditem({ data, index, columnIndex }) {
         className={`${snapshot.isDragging ? 'border-2 border-black/50 bg-sky-300' : 'border-0 bg-white'}  rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full`}
       > */}
         <div className='flex justify-between'>
-          <span className='flex text-lg'>{data.title}</span>
+          <span className='flex text-base font-semibold'>{data.title}</span>
           <FiEdit onClick={() => {
             setOpen(true);
           }} className='w-5 h-5 cursor-pointer'/>
         </div>  
         {/* <span className=' text-md my-3 text-base leading-6'>{data.content}</span> */}
         
-        <div className='flex flex-row justify-between items-center'>
-          <div className='flex justify-start'>
+        {/* <div className='flex flex-row justify-between items-center'> */}
+          {/* <div className='flex justify-start'>
             {
               data.labels &&
               data?.labels.map((label, index) =>{
@@ -87,7 +87,7 @@ export default function Carditem({ data, index, columnIndex }) {
                 )
               }) 
             }
-          </div>
+          </div> */}
           <div className=" flex justify-end items-center space-x-1">
             {
               data.assignees &&
@@ -100,7 +100,7 @@ export default function Carditem({ data, index, columnIndex }) {
               })
             }
           </div>
-        </div> 
+        {/* </div>  */}
       {/* </div>
     )}
     </Draggable> */}

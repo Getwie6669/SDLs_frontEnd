@@ -2,9 +2,17 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import { IoBulbOutline } from 'react-icons/io5';
+import { FaRegLightbulb } from "react-icons/fa";
+import { MdOutlineViewKanban } from "react-icons/md";
+import { TiFolderOpen } from "react-icons/ti";
 import { AiOutlineProject } from "react-icons/ai";
+import { CgNotes,CgFolder  } from "react-icons/cg";
 import { BsBezier2, BsChatText, BsJournalText, BsFolder } from "react-icons/bs";
 import { GrCompliance } from "react-icons/gr";
+import { BiTask } from "react-icons/bi";
+import { BsChatDots } from "react-icons/bs";
+
+
 import ChatRoom from './ChatRoom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
@@ -13,12 +21,12 @@ export default function SideBar() {
     const [chatRoomOpen, setChatRoomOpen] = useState(false);
     const { projectId } = useParams();
     const menus = [
-        { name: "專案", link: `/project/${projectId}/kanban`, icon: AiOutlineProject, margin: "true" },
-        { name: "想法牆", link: `/project/${projectId}/ideaWall`, icon: IoBulbOutline },
-        { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
-        { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
-        { name: "撰寫日誌", link: `/project/${projectId}/reflection`, icon: BsJournalText },
-        { name: "學習歷程", link: `/project/${projectId}/protfolio`, icon: BsFolder }
+        { name: "進度看板", link: `/project/${projectId}/kanban`, icon: MdOutlineViewKanban, margin: "true" },
+        { name: "想法延伸", link: `/project/${projectId}/ideaWall`, icon: FaRegLightbulb },
+        // { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
+        { name: "反思日誌", link: `/project/${projectId}/reflection`, icon: CgNotes },        
+        { name: "歷程檔案", link: `/project/${projectId}/protfolio`, icon: TiFolderOpen },
+        { name: "成果紀錄", link: `/project/${projectId}/submitTask`, icon: BiTask }
     ]
     const [stageInfo, setStageInfo] = useState({ name: "", description: "" });
     const currentStage = localStorage.getItem("currentStage");
@@ -117,7 +125,7 @@ export default function SideBar() {
                         projectId === undefined ? <></> :
                             <span onClick={() => setChatRoomOpen(true)} className="group flex items-center text-base gap-3.5 font-medium p-3  rounded-xl cursor-pointer bg-zinc-800 ">
                                 <div className='ml-1'>
-                                    <BsChatText size={"26"} className={"text-white"} />
+                                    <BsChatDots size={"26"} className={"text-white"} />
                                 </div>
                                 <h2 style={{ transitionDelay: "700ms", }} className={`whitespace-pre text-sm duration-500 ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
                                     聊天室
