@@ -135,7 +135,7 @@ export default function Reflection() {
                 </div>
                 {/* <hr className='w-full h-[3px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' /> */}
                 <div className='flex flex-wrap justify-start items-center w-full mb-5'>
-                    <div className='flex overflow-x-auto py-2 scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
+                    <div className='flex overflow-x-auto py-2  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
                         {
                             isLoading ? <Loader /> :
                                 isError ? <p className='text-base font-bold'>{error.message}</p> :
@@ -173,7 +173,7 @@ export default function Reflection() {
 
                 {/* <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' /> */}
                 <div className='  flex flex-wrap justify-start items-center w-full mb-5'>
-                    <div className='flex overflow-x-auto py-2 scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
+                    <div className='flex overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
                         {
                             teamDailyQuery.isLoading ? <Loader /> :
                                 teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
