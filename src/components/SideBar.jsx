@@ -81,7 +81,7 @@ export default function SideBar() {
 
     return (
         <>
-            <div className={` bg-[#FFF] absolute inset-y-0 pt-16 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-40" : "w-16"}`}>
+            <div className={` z-10 bg-[#FFF] absolute inset-y-0 pt-16 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-40" : "w-16"}`}>
                 <div className='flex flex-col justify-between h-full'>
                     <div>
                     <div className='mt-2 pt-3 pl-3 flex justify-start'>

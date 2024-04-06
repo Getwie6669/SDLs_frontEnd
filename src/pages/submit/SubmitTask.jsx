@@ -58,6 +58,7 @@ export default function SubmitTask() {
         }));
     }
     const handleAddFileChange = e =>{
+        console.log(e.target.files)
         setAttachFile(e.target.files); 
     }
 

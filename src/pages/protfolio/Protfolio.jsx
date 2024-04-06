@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AiTwotoneFolderAdd } from "react-icons/ai";
 import { GrFormClose } from "react-icons/gr";
@@ -6,75 +7,137 @@ import { getAllSubmit } from '../../api/submit';
 import { useParams } from 'react-router-dom';
 import Loader from '../../components/Loader';
 import FolderModal from './components/folderModal';
+import dateFormat from 'dateformat';
 
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import FileDownload from 'js-file-download';
 
 export default function Protfolio() {
-    const [stageProtfolio, setStageProtfolio] = useState([]);
+    const [stagePortfolio, setStagePortfolio] = useState([]);
     const [folderModalOpen, setFolderModalOpen] = useState(false);
     const [modalData, setModalData] = useState({});
     const { projectId } = useParams();
+    const [activeItemId, setActiveItemId] = useState(null); // 新增状态以追踪当前被点击的项目 ID
 
     const {
         isLoading,
         isError,
     } = useQuery("protfolioDatas", () => getAllSubmit(
         { params: { projectId: projectId } }),
-        { onSuccess: setStageProtfolio }
+        { onSuccess: setStagePortfolio }
     );
+    const stageDescriptions = {
+        "1-1": "提出研究主題",
+        "1-2": "提出研究目的",
+        "1-3": "提出研究問題",
+        "2-1": "訂定研究構想表",
+        "2-2": "設計研究記錄表",
+        "2-3": "規劃研究排程",
+        "3-1": "進行嘗試性研究",
+        "3-2": "分析資列與繪圖",
+        "3-3": "撰寫研究結果",
+        "4-1": "檢視研究進度",
+        "4-2": "進行研究討論",
+        "4-3": "撰寫研究結論"
+    };
+    const insertTitles = ["定標", "擇策", "監評", "調節"];
+    let portfolioItemsWithTitles = [];
+    // 加入首行文字
+    stagePortfolio.forEach((item, index) => {
+        if (index % 3 === 0) {
+            // 每三個項目前插入一個文字物件，使用splice方法
+            const titleIndex = Math.floor(index / 3);
+            const title = insertTitles[titleIndex];
+            if (title) {
+                portfolioItemsWithTitles.push({ type: 'title', content: title });
+            }
+        }
+        portfolioItemsWithTitles.push({ type: 'item', content: item });
+    });
 
     return (
         <div className='min-w-full min-h-screen h-screen'>
             <div className='flex-grow'>
                 <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-start'>
-                    <h3 className='text-lg font-bold mb-4'>歷程檔案</h3>
+                    {/* <h3 className='text-lg font-bold mb-4'>歷程檔案</h3> */}
                     <div className=' flex flex-wrap justify-start items-center w-full mb-5 pr-80'>
                         {
                             isLoading ? <Loader /> :
                                 isError ? <p className=' font-bold text-2xl'>{isError.message}</p> :
-                                    stageProtfolio.map(item => {
-                                        const { id, stage } = item;
-                                        return (
-                                            <div className='flex mx-3 mb-3' key={id} style={{ minWidth: 'calc(33.333% - 2rem)', maxWidth: 'calc(33.333% - 2rem)' }}>
-                                                <button
-                                                    className="inline-flex items-center justify-center w-full h-28 bg-[#5BA491] text-white border-2 font-semibold rounded-lg p-2 text-base"
-                                                    onClick={() => {
-                                                        setFolderModalOpen(true);
-                                                        setModalData(item);
+                                    // stagePortfolio.map(item => {
+                                    portfolioItemsWithTitles.map((item, index) => {
+                                        if (item.type === 'title') {
+                                            return (
+                                                <>
+                                                    <div key={`title-${index}`} className="w-full mb-3">
+                                                        <h3 className="text-xl font-bold">{item.content}</h3>
+                                                    </div>
+                                                    <div className="w-full h-0.5 bg-[#5BA491] mb-3 mr-5"></div>
+                                                </>
+                                            );
+                                        } else {
+                                            const { id, stage, createdAt } = item.content;
+                                            const description = stageDescriptions[stage] || "未知階段";
+                                            const isActive = id === activeItemId;
+                                            return (
+                                                <div
+                                                    className={`flex mx-3 mb-3 transition duration-500 ease-in-out transform ${isActive ? 'scale-105 bg-[#487e6c]' : 'bg-[#5BA491]'} rounded-lg`}
+                                                    key={id}
+                                                    style={{
+                                                        minWidth: 'calc(33.333% - 2rem)', maxWidth: 'calc(33.333% - 2rem)'
                                                     }}
                                                 >
-                                                    <AiTwotoneFolderAdd size={24} className="mr-2" /> <span>{stage}</span>
-                                                </button>
-                                            </div>
-                                        )
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-full h-28  text-white  font-semibold rounded-lg p-5 mx-5 text-base flex-col" 
+                                                        onClick={() => {
+                                                            setActiveItemId(id); 
+                                                            setFolderModalOpen(true);
+                                                            setModalData(item.content);
+                                                            console.log(item);
+                                                        }}
+                                                    >
+                                                        <div className="flex items-center justify-center">
+                                                            <AiTwotoneFolderAdd size={30} className="mr-2" />
+                                                            {/* <span>{stage}</span> */}
+                                                            <span className="ml-2 text-lg">{description}</span>
+                                                        </div>
+                                                        <div className="mt-5 text-sm text-white">
+                                                            <span className='mr-2'>完成時間</span>
+                                                            {dateFormat(createdAt, "yyyy/mm/dd")}
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            )
+                                        }
                                     })
+                            // })
                         }
                     </div>
-                    {/* <FolderModal folderModalOpen={folderModalOpen} setFolderModalOpen={setFolderModalOpen} modalData={modalData} /> */}
                 </div>
             </div>
 
             <div className={`w-[400px] h-full fixed right-0 top-16 bg-white shadow-lg transform ease-in-out duration-300 ${folderModalOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <button onClick={() => setFolderModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-                    <GrFormClose className=' w-6 h-6' />
+                <button onClick={() => setFolderModalOpen(false)} className="absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200">
+                    <GrFormClose className="w-6 h-6" />
                 </button>
-                <div className='flex flex-col justify-start items-center w-full p-4'>
-                    {modalData.content ?
-                        Object.entries(JSON.parse(modalData.content)).map((element, index) => {
-                            const name = element[0];
-                            const content = element[1];
-                            return (
-                                <div className='mt-3' key={index}>
-                                    <span className='font-bold text-base'>{name}:</span>
-                                    <span className='font-bold text-base'>{content}</span>
+                <div className="flex flex-col justify-start items-center w-full p-4">
+                    <div className="text-center py-2">
+                        <h2 className="text-xl font-bold text-[#5BA491]">{stageDescriptions[modalData.stage]}</h2>
+                        <span className="text-sm text-gray-600">階段: {modalData.stage}</span>
+                    </div>
+                    {
+                        modalData.content ?
+                            Object.entries(JSON.parse(modalData.content)).map((element, index) => (
+                                <div className="mt-3 p-4 bg-gray-100 rounded-lg w-full" key={index}>
+                                    <span className="font-bold text-lg text-gray-700">{element[0]}:</span>
+                                    <p className="text-gray-600">{element[1]}</p>
                                 </div>
-                            )
-                        })
-                        : <p>沒有可顯示的內容</p>}
+                            ))
+                            : <p className="text-gray-700">沒有可顯示的內容</p>
+                    }
                     {modalData.filename && (
                         <button
-                            className="inline-flex items-center bg-white hover:bg-slate-200/80 text-slate-400 border-2 border-slate-400 font-semibold rounded-md p-1 mt-3 sm:px-4 text-base  min-w-[100px]"
+                            className="mt-3 inline-flex items-center justify-center px-4 py-2 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out"
                             onClick={() => {
                                 setQueryFetch(prev => !prev);
                             }}

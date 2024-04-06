@@ -22,7 +22,7 @@ export default function svgConvertUrl(title,owner,createdAt) {
                             {owner}
                         </span>
                         <span>
-                            {dateFormat(createdAt,"yyyy/mm/dd H:M:s")}
+                            {dateFormat(createdAt,"yyyy/mm/dd HH:MM:ss")}
                         </span>
                     </div>
                 </div>
