@@ -11,13 +11,16 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { createProject, getAllProject, inviteForProject } from '../../api/project';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { GrFormAdd } from "react-icons/gr";
+import { MdAddchart } from "react-icons/md";
+import dateFormat from 'dateformat';
 
 export default function HomePage() {
-  const [ projectData, setProjectData ] = useState([]);
-  const [ createprojectData, setCreateProjectData] = useState({projectMentor:"吳老師"});
-  const [ inviteprojectData, setInviteProjectData] = useState({});
-  const [ createProjectModalOpen, setCreateProjectModalOpen ] = useState(false);
-  const [ inviteProjectModalOpen, setInviteProjectModalOpen ] = useState(false)
+  const [projectData, setProjectData] = useState([]);
+  const [createprojectData, setCreateProjectData] = useState({ projectMentor: "吳老師" });
+  const [inviteprojectData, setInviteProjectData] = useState({});
+  const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false);
+  const [inviteProjectModalOpen, setInviteProjectModalOpen] = useState(false)
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -26,11 +29,11 @@ export default function HomePage() {
     isError,
     error,
     data
-  } = useQuery( "projectDatas", () => getAllProject(
-    {  params: { userId: localStorage.getItem("id") } }), 
-    {onSuccess:setProjectData }
+  } = useQuery("projectDatas", () => getAllProject(
+    { params: { userId: localStorage.getItem("id") } }),
+    { onSuccess: setProjectData }
   );
-  
+
   // const {mutate} = useMutation( createProject, {
   //   onSuccess : ( res ) =>{
   //     console.log(res);
@@ -42,8 +45,8 @@ export default function HomePage() {
   //     errorReferralCodeNotify(error.response.data.message)
   //   }
   // })
-  const {mutate} = useMutation( createProject, {
-    onSuccess : ( res ) =>{
+  const { mutate } = useMutation(createProject, {
+    onSuccess: (res) => {
       console.log(res);
       queryClient.invalidateQueries("projectDatas")
       // sucesssReferralCodeNotify(res.message)
@@ -55,9 +58,9 @@ export default function HomePage() {
           backdrop: 'bg-red-500', // 背景颜色
           popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
         },
-    });
+      });
     },
-    onError : (error) =>{
+    onError: (error) => {
       console.log(error);
       // errorReferralCodeNotify(error.response.data.message)
       Swal.fire({
@@ -68,7 +71,7 @@ export default function HomePage() {
           backdrop: 'bg-red-500', // 背景颜色
           popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
         },
-    });
+      });
     }
   })
 
@@ -85,194 +88,227 @@ export default function HomePage() {
   // })
   const { mutate: referral_CodeMutate } = useMutation(inviteForProject, {
     onSuccess: (res) => {
-        console.log(res);
-        queryClient.invalidateQueries('projectDatas');
-        // 使用SweetAlert2显示成功消息
-        Swal.fire({
-            icon: 'success',
-            title: '成功',
-            text: res.message,
-            customClass: {
-              backdrop: 'bg-red-500', // 背景颜色
-              popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
-            },
-        });
+      console.log(res);
+      queryClient.invalidateQueries('projectDatas');
+      // 使用SweetAlert2显示成功消息
+      Swal.fire({
+        icon: 'success',
+        title: '成功',
+        text: res.message,
+        customClass: {
+          backdrop: 'bg-red-500', // 背景颜色
+          popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+        },
+      });
     },
     onError: (error) => {
-        console.log(error);
-        // 使用SweetAlert2显示错误消息
-        Swal.fire({
-            icon: 'error',
-            title: '失敗',
-            text: error.response.data.message,
-            customClass: {
-              backdrop: 'bg-red-500', // 背景颜色
-              popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
-            },
-        });
+      console.log(error);
+      // 使用SweetAlert2显示错误消息
+      Swal.fire({
+        icon: 'error',
+        title: '失敗',
+        text: error.response.data.message,
+        customClass: {
+          backdrop: 'bg-red-500', // 背景颜色
+          popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+        },
+      });
     },
-});
-  const handleChange = e =>{
+  });
+  const handleChange = e => {
     const { name, value } = e.target;
-    setCreateProjectData( prev => ({
-        ...prev,
-        [name]:value,
-        userId:localStorage.getItem("id") 
+    setCreateProjectData(prev => ({
+      ...prev,
+      [name]: value,
+      userId: localStorage.getItem("id")
     }));
   }
 
-  const handleCreateProject = () =>{
+  const handleCreateProject = () => {
     mutate(createprojectData);
   }
 
-  const handleChangeReferral_Code = e =>{
+  const handleChangeReferral_Code = e => {
     const { name, value } = e.target;
     setInviteProjectData({
-      [name]:value,
-      userId:localStorage.getItem("id") 
+      [name]: value,
+      userId: localStorage.getItem("id")
     })
   }
 
-  const handleSubmitReferral_Code = () =>{
+  const handleSubmitReferral_Code = () => {
     referral_CodeMutate(inviteprojectData);
   }
 
   const errorReferralCodeNotify = (toastContent) => toast.error(toastContent);
   const sucesssReferralCodeNotify = (toastContent) => toast.success(toastContent);
 
+  function formatRelativeTime(date) {
+    const now = new Date();
+    const diffInSeconds = (now - new Date(date)) / 1000;
+    if (diffInSeconds < 60) return '剛剛';
+    else if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分鐘前`;
+    else if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小時前`;
+    else return `${Math.floor(diffInSeconds / 86400)}天前`;
+  }
+
+  const calculateProgress = (currentStage, currentSubStage) => {
+    if (currentStage === 5) {
+      return (12 + currentSubStage) / 17 * 100;
+    } else {
+      return ((currentStage - 1) * 3 + currentSubStage) / 17 * 100;
+    }
+  }
+  const calculateProgressPercentage = (currentStage, currentSubStage) => {
+    let percentage;
+    if (currentStage === 5) {
+      percentage = (12 + currentSubStage) / 17 * 100;
+    } else {
+      percentage = ((currentStage - 1) * 3 + currentSubStage) / 17 * 100;
+    }
+    return percentage.toFixed(2);
+  }
+
+  const Tooltip = ({ children, content }) => {
+    return (
+      <div className='relative group'>
+        {children}
+        <div className='absolute bottom-full mb-2 hidden group-hover:block'>
+          <div className='bg-gray-700 text-white text-xs rounded-lg py-1 px-2 whitespace-nowrap'>
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    // <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
-    //   <div className='w-full flex justify-start items-center'>成功登入主頁!!!</div>
-    //   <button type="submit" onClick={navigate("/")} style= { {backgroundColor:"#5BA491" } } className="w-full block hover:bg-violet-400 focus:bg-violet-400 text-white font-semibold rounded-lg px-4 py-3 mt-6 text-base">登入</button>
-    // </div>
-
-
-    // <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
-    //   <TopBar />
-    //   <div className='py-16 flex justify-start items-center'>成功登入主頁!!!</div>
-    //   <button onClick={()=>handleCreateProject()} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 mr-1 sm:px-4 sm:mr-4 sm:py-1 text-base">建立專案</button>
-    //   <div className='flex'>
-
-    //          <FaSortDown size={15} className=' cursor-pointer'/>
-    //        </div>
-    // </div>
-
-
-    <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
-      {/* <SideBar /> */}
+    <div className='min-w-full min-h-screen bg-gray-100 overflow-auto'>
       <TopBar />
-      
-      <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-center'>
-        <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 mb-5'>
-          <div className='flex'>
-            <button onClick={()=>setCreateProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 mr-1 sm:px-4 sm:mr-4 sm:py-1 text-base">建立專案</button>
-            <button onClick={()=>setInviteProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 sm:px-4 sm:py-1 text-base">加入專案</button>
+      <div className='flex flex-col my-10 px-10 md:px-20 py-10 w-full items-center'>
+        <div className='flex flex-col w-full md:w-11/12 lg:w-3/4'>
+          <div className='flex justify-start mb-8 mt-8'>
+            <button
+              onClick={() => setCreateProjectModalOpen(true)}
+              className="flex items-center justify-center bg-[#5BA491] hover:bg-[#5BA491]/80 text-white font-semibold rounded-lg px-6 py-2 shadow-md transition duration-200 ease-in-out transform hover:scale-105 mr-4"
+            >
+              <MdAddchart className="mr-2" /> 建立專案
+            </button>
+            <button
+              onClick={() => setInviteProjectModalOpen(true)}
+              className="flex items-center justify-center bg-[#5BA491] hover:bg-[#5BA491]/80 text-white font-semibold rounded-lg px-6 py-2 shadow-md transition duration-200 ease-in-out transform hover:scale-105"
+            >
+              <MdAddchart className="mr-2" /> 加入專案
+            </button>
           </div>
-          <div className='flex'>
-            <span className=' text-sm mr-3 font-bold cursor-pointer'>已開啟</span>
-            <span className=' text-sm mr-3 font-bold cursor-pointer'>已關閉</span>
-            <span className=' text-sm font-bold cursor-pointer'>日期</span>
-            <FaSortDown size={15} className=' cursor-pointer'/>
-          </div>
-        </div>
-        {/* item */}
-        <div className='flex flex-col items-center w-full h-screen overflow-hidden overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400/70 scrollbar-track-slate-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
-          {
-            isLoading ? <Loader /> : 
-            isError ? <p className=' font-bold text-2xl'> {error.message}</p> : 
-            projectData.map(( projectItem, index)=>{
-              return(
-                <div key={index} className=' rounded-lg border-2 w-full sm:w-2/3 min-h-[100px] mt-3 bg-white'>
-                  <div className='flex flex-row  w-full h-full'>
-                    <div className='flex w-1/4 justify-center items-center text-lg font-bold'>{projectItem?.name}</div> 
-                    <div className='flex w-1/2 justify-center items-center text-lg font-bold'>{projectItem?.describe}</div>
-                    <div className='flex w-1/4 justify-center items-center'>
-                        <BsBoxArrowInRight size={30} className=' cursor-pointer' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
-                    </div> 
-                  </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            {projectData.map((projectItem, index) => (
+              <div key={index} className='bg-white w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
+                <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
+                <p className='text-gray-600'>{projectItem.describe}</p>
+                <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
+                <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
+                <div className='flex justify-between text-sm text-gray-500'>
+                  <span className='flex items-center text-gray-500'>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M3 12a9 9 0 110 18 9 9 0 010-18zm9 9a9 9 0 100-18 9 9 0 000 18z" />
+                    </svg>
+                    創建於 {dateFormat(projectItem.createdAt, "yyyy/mm/dd")}
+                  </span>
+                  <span className='flex items-center text-gray-500'>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M3 12a9 9 0 110 18 9 9 0 010-18zm9 9a9 9 0 100-18 9 9 0 000 18z" />
+                    </svg>
+                    更新於 {formatRelativeTime(projectItem.updatedAt)}
+                  </span>
                 </div>
-              )
-            })
-          }
-            <div className='flex justify-center items-center rounded-lg border-[5px] w-full sm:w-2/3 min-h-[100px] mt-3 bg-white text-slate-400 text-xl font-bold'>
-                建立新專案
-            </div>
+                <Tooltip children={"活動進度"} content={`已完成${calculateProgressPercentage(projectItem.currentStage, projectItem.currentSubStage)}%`}>
+                  <div className='w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700'>
+                    <div className='bg-[#5BA491] h-2.5 rounded-full transition-all duration-300 ease-in-out' style={{ width: `${calculateProgress(projectItem.currentStage, projectItem.currentSubStage)}%` }}></div>
+                  </div>
+                </Tooltip>
+                <button className='mt-2 bg-[#5BA491] text-white rounded-lg px-4 py-2 hover:bg-[#5BA491]/80 transition duration-200 ease-in-out' onClick={() => navigate(`/project/${projectItem.id}/kanban`)}>查看活動</button>
+              </div>
+            ))}
+          </div>
+
         </div>
-      </div> 
-      <Modal open={createProjectModalOpen} onClose={() => setCreateProjectModalOpen(false)} opacity={true} position={"justify-center items-center"}> 
-          <button onClick={() => setCreateProjectModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-            <GrFormClose  className=' w-6 h-6'/>
-          </button> 
-          <div className='flex flex-col p-3'>
-                <h3 className=' font-bold text-base mb-3'>建立專案</h3>
-                <p className=' font-bold text-base mb-3'>專案名稱</p>
-                <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3" 
-                    type="text" 
-                    placeholder="專案名稱..."
-                    name='projectName'
-                    onChange={handleChange}
-                    required
-                    />
-                <p className=' font-bold text-base mb-3'>專案描述</p>
-                <textarea className=" rounded outline-none ring-2 ring-customgreen w-full p-1" 
-                    rows={3} 
-                    placeholder="描述名稱" 
-                    name='projectdescribe'
-                    onChange={handleChange}
-                    />
-                <div className="mt-4">
-                    <label className="block text-gray-700 text-base">指導老師</label>
-                    <select name="projectMentor" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
-                        <option value="吳老師">吳老師</option>
-                    </select>
-                </div> 
-            </div>
-            <div className='flex justify-end m-2'>
-                <button 
-                  onClick={() => setCreateProjectModalOpen(false)} 
-                  className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2" >
-                    取消
-                </button>
-                <button onClick={()=>{
-                  handleCreateProject();
-                  setCreateProjectModalOpen(false);
-                  }} 
-                  type="submit"
-                  className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
-                    儲存
-                </button>
-                
-            </div> 
+      </div>
+
+      <Modal open={createProjectModalOpen} onClose={() => setCreateProjectModalOpen(false)} opacity={true} position={"justify-center items-center"}>
+        <button onClick={() => setCreateProjectModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+          <GrFormClose className=' w-6 h-6' />
+        </button>
+        <div className='flex flex-col p-3'>
+          <h3 className=' font-bold text-base mb-3'>建立專案</h3>
+          <p className=' font-bold text-base mb-3'>專案名稱</p>
+          <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+            type="text"
+            placeholder="專案名稱..."
+            name='projectName'
+            onChange={handleChange}
+            required
+          />
+          <p className=' font-bold text-base mb-3'>專案描述</p>
+          <textarea className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+            rows={3}
+            placeholder="描述名稱"
+            name='projectdescribe'
+            onChange={handleChange}
+          />
+          <div className="mt-4">
+            <label className="block text-gray-700 text-base">指導老師</label>
+            <select name="projectMentor" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
+              <option value="吳老師">吳老師</option>
+            </select>
+          </div>
+        </div>
+        <div className='flex justify-end m-2'>
+          <button
+            onClick={() => setCreateProjectModalOpen(false)}
+            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2" >
+            取消
+          </button>
+          <button onClick={() => {
+            handleCreateProject();
+            setCreateProjectModalOpen(false);
+          }}
+            type="submit"
+            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
+            儲存
+          </button>
+
+        </div>
       </Modal>
-      <Modal open={inviteProjectModalOpen} onClose={() => setInviteProjectModalOpen(false)} opacity={true} position={"justify-center items-center"}> 
-          <button onClick={() => setInviteProjectModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-            <GrFormClose  className=' w-6 h-6'/>
-          </button> 
-          <div className='flex flex-col p-3'>
-                <h3 className=' font-bold text-base mb-3'>專案邀請碼</h3>
-                <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3 " 
-                    type="text" 
-                    minLength="6"
-                    placeholder="輸入專案邀請碼..."
-                    name='referral_Code'
-                    onChange={handleChangeReferral_Code}
-                    required
-                  />
-            </div>
-            <div className='flex justify-end m-2'>
-                <button onClick={()=>{
-                  handleSubmitReferral_Code();
-                  setInviteProjectModalOpen(false);
-                  }} 
-                  className="mx-auto w-1/4 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
-                  type="submit"
-                  >
-                    加入
-                </button>
-                
-            </div> 
+      <Modal open={inviteProjectModalOpen} onClose={() => setInviteProjectModalOpen(false)} opacity={true} position={"justify-center items-center"}>
+        <button onClick={() => setInviteProjectModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+          <GrFormClose className=' w-6 h-6' />
+        </button>
+        <div className='flex flex-col p-3'>
+          <h3 className=' font-bold text-base mb-3'>專案邀請碼</h3>
+          <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3 "
+            type="text"
+            minLength="6"
+            placeholder="輸入專案邀請碼..."
+            name='referral_Code'
+            onChange={handleChangeReferral_Code}
+            required
+          />
+        </div>
+        <div className='flex justify-end m-2'>
+          <button onClick={() => {
+            handleSubmitReferral_Code();
+            setInviteProjectModalOpen(false);
+          }}
+            className="mx-auto w-1/4 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+            type="submit"
+          >
+            加入
+          </button>
+
+        </div>
       </Modal>
-      <Toaster />
+      {/* <Toaster /> */}
     </div>
   )
 }

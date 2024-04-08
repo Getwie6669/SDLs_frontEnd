@@ -55,6 +55,17 @@ export default function Protfolio() {
         portfolioItemsWithTitles.push({ type: 'item', content: item });
     });
 
+    const downloadFile = () => {
+        if (modalData.fileData && modalData.fileData.data) {
+            // 将 Buffer 转换为 Uint8Array
+            const buffer = new Uint8Array(modalData.fileData.data);
+            // 创建 Blob 对象
+            const blob = new Blob([buffer], { type: "application/octet-stream" });
+            // 触发文件下载
+            FileDownload(blob, "downloaded-file.png"); // 请根据实际文件类型调整 MIME 类型和文件名
+        }
+    };
+
     return (
         <div className='min-w-full min-h-screen h-screen'>
             <div className='flex-grow'>
@@ -68,16 +79,19 @@ export default function Protfolio() {
                                     portfolioItemsWithTitles.map((item, index) => {
                                         if (item.type === 'title') {
                                             return (
-                                                <>
-                                                    <div key={`title-${index}`} className="w-full mb-3">
+                                                <React.Fragment key={`title-${index}`}>
+                                                    <div className="w-full mb-3">
                                                         <h3 className="text-xl font-bold">{item.content}</h3>
                                                     </div>
                                                     <div className="w-full h-0.5 bg-[#5BA491] mb-3 mr-5"></div>
-                                                </>
+                                                </React.Fragment>
                                             );
                                         } else {
                                             const { id, stage, createdAt } = item.content;
-                                            const description = stageDescriptions[stage] || "未知階段";
+                                            const description = stageDescriptions[stage];
+                                            if (!description) return null; // 如果stage不在stageDescriptions中，则不渲染
+
+
                                             const isActive = id === activeItemId;
                                             return (
                                                 <div
@@ -88,9 +102,9 @@ export default function Protfolio() {
                                                     }}
                                                 >
                                                     <button
-                                                        className="inline-flex items-center justify-center w-full h-28  text-white  font-semibold rounded-lg p-5 mx-5 text-base flex-col" 
+                                                        className="inline-flex items-center justify-center w-full h-28  text-white  font-semibold rounded-lg p-5 mx-5 text-base flex-col"
                                                         onClick={() => {
-                                                            setActiveItemId(id); 
+                                                            setActiveItemId(id);
                                                             setFolderModalOpen(true);
                                                             setModalData(item.content);
                                                             console.log(item);
@@ -135,16 +149,37 @@ export default function Protfolio() {
                             ))
                             : <p className="text-gray-700">沒有可顯示的內容</p>
                     }
-                    {modalData.filename && (
-                        <button
-                            className="mt-3 inline-flex items-center justify-center px-4 py-2 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out"
-                            onClick={() => {
-                                setQueryFetch(prev => !prev);
-                            }}
-                        >
-                            <AiOutlineCloudDownload size={32} className="text-black mr-1" />
-                            <span>下載附件</span>
-                        </button>
+                    {modalData.fileData && (
+                        <>
+                            <div className="mt-3 p-4 bg-gray-100 rounded-lg w-full">
+                                <span className="font-bold text-lg text-gray-700">附加檔案:</span>
+                                <p className="text-gray-600">{modalData.fileName}</p>
+                            </div>
+                            <button
+                                className="mt-3 inline-flex items-center justify-center px-4 py-2 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out"
+                                onClick={() => {
+                                    if (modalData.fileData && modalData.fileData.data && modalData.fileName) {
+                                        console.log("modalData", modalData)
+                                        // // 将 Buffer 转换为 Uint8Array
+                                        // const buffer = new Uint8Array(modalData.fileData.data);
+                                        // // 创建 Blob 对象
+                                        // const blob = new Blob([buffer], { type: modalData.mimetype });
+
+
+                                        // 将 Buffer 转换为 Uint8Array
+                                        const buffer = new Uint8Array(modalData.fileData.data);
+                                        // 创建 Blob 对象
+                                        const blob = new Blob([buffer], { type: "application/octet-stream" });
+
+                                        // 触发文件下载
+                                        FileDownload(blob, modalData.fileName);
+                                    }
+                                }}
+                            >
+                                <AiOutlineCloudDownload size={32} className="text-white mr-1" />
+                                <span>下載附件</span>
+                            </button>
+                        </>
                     )}
                     {isLoading && <Loader />}
                     {isError && <p>載入錯誤</p>}

@@ -58,7 +58,7 @@ export default function SubmitTask() {
         }));
     }
     const handleAddFileChange = e =>{
-        console.log(e.target.files)
+        // console.log(e.target.files)
         setAttachFile(e.target.files); 
     }
 
@@ -72,6 +72,7 @@ export default function SubmitTask() {
         if(attachFile){
             for (let i = 0; i < attachFile.length; i++){
                 formData.append("attachFile", attachFile[i])
+                console.log("attachFile[i]",attachFile)
             }
         }
         for(let key in taskData){

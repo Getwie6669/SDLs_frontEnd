@@ -37,11 +37,11 @@ const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
         ["在這個階段你可以定期檢視研究行程和成果，評估是否需要調整研究方向或方法!",
             "在這個階段你可以組織研究討論會，呈現研究結果，收集與整合回饋意見，對研究進行深入分析與完善!",
             "在這個階段你可以基於研究結果和討論，撰寫結論部分，明確指出研究的貢獻和後續研究的建議~"],
-            ["使用線上設計軟體（Pixlr、Canva、Fotor）進行設計，確保封面既美觀又具有專業度，建議可以保持簡潔，避免過多的裝飾元素。",
-                "摘要文長建議約300字左右，簡練地概述統整後的學習活動的背景、目標、方法、主要發現或成果以及結論。",
-                "建議可依據學習主題進行分類排序，整理出一目了然的目錄，讓讀者快速理解你想呈現的學習重點。",
-                "建議根據歷程檔案中的階段紀錄資訊進行重製，內容的撰寫切記保持語言清晰、邏輯嚴謹。",
-                "反思撰寫切記「重質不重量」，不是越多越好!可以思考當初為何要參加?在過程中學會什麼?"]
+        ["使用線上設計軟體（Pixlr、Canva、Fotor）進行設計，確保封面既美觀又具有專業度，建議可以保持簡潔，避免過多的裝飾元素。",
+            "摘要文長建議約300字左右，簡練地概述統整後的學習活動的背景、目標、方法、主要發現或成果以及結論。",
+            "建議可依據學習主題進行分類排序，整理出一目了然的目錄，讓讀者快速理解你想呈現的學習重點。",
+            "建議根據歷程檔案中的階段紀錄資訊進行重製，內容的撰寫切記保持語言清晰、邏輯嚴謹。",
+            "反思撰寫切記「重質不重量」，不是越多越好!可以思考當初為何要參加?在過程中學會什麼?"]
     ];
 
     const [displayedContent, setDisplayedContent] = useState('');
@@ -105,6 +105,7 @@ const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
         setDialogContent('嗨!有什麼能夠幫助你的嗎?');
         setShowOptions(true);
         onClose();
+        // setImageSrc('/robot.png'); 
     };
 
     if (!isOpen && animationClass.includes('opacity-0')) return null;
@@ -155,19 +156,29 @@ const getTextColor = (stageIndex) => {
         return 'text-slate-700'; // 其他阶段
     }
 };
+
+
 export default function SubStageComponent() {
     const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
     const stages = isValidStageIndex ? stageInfo[currentStageIndex - 1] : [];
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [imageSrc, setImageSrc] = useState('/robot.png');
+    const [isHovered, setIsHovered] = useState(false);
+    const [ignoreHover, setIgnoreHover] = useState(false); // 新增狀態
 
     const handleRobotClick = () => {
         document.body.style.overflow = 'hidden'; // 開啟DialogBox時禁止滾動
         setDialogOpen(true);
+        setImageSrc('/robot2.png');
+        setIgnoreHover(true);
     };
 
     const handleCloseDialog = () => {
         document.body.style.overflow = ''; // 關閉DialogBox時恢復滾動
         setDialogOpen(false);
+        setImageSrc('/robot.png')
+        setIgnoreHover(false); // 重置懸浮狀態
+
     };
 
     const handleOptionSelect = (option) => {
@@ -176,18 +187,22 @@ export default function SubStageComponent() {
         // 这里可以根据选项做更多的逻辑处理
     };
     // 使用状态来管理图片源
-    const [imageSrc, setImageSrc] = useState('/robot.png');
-    const [isHovered, setIsHovered] = useState(false);
+
 
     // 鼠标悬停时更改图片
     const handleMouseEnter = () => {
-        setImageSrc('/robot2.png')
+        if (!ignoreHover) {
+            setImageSrc('/robot2.png')
+        }
         setIsHovered(true)
     }
 
     // 鼠标离开时恢复原图片
     const handleMouseLeave = () => {
-        setImageSrc('/robot.png')
+        if (!ignoreHover) {
+            setImageSrc('/robot.png')
+            
+        }
         setIsHovered(false)
     }
 
