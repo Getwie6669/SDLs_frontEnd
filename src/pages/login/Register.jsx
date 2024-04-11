@@ -5,6 +5,8 @@ import { useMutation } from 'react-query';
 import { userRegister } from '../../api/users';
 import { AuthContext } from '../../utils/AuthContext';
 import Swal from 'sweetalert2';
+import Login_icon from "../../assets/Animation-login.json";
+import Lottie from "lottie-react";
 
 export default function Register() {
     const [userData, setUserData] = useState({role:"student"});
@@ -96,9 +98,24 @@ export default function Register() {
     return (
         <section className="flex flex-col md:flex-row h-screen items-center">
             <div className="hidden bg-white w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
-                <div className='flex flex-col'>
-                <h1 className='mx-auto  text-7xl mb-2'>自主學習</h1>
-                <img src='images/login.png' width={'600px'} alt='I am B' />
+            <div className='flex flex-col items-center justify-center h-full'>
+                {/* <h1 className='mx-auto  text-7xl mb-2'>自主學習</h1> */}
+                <TypeAnimation
+                  sequence={[
+                    "自主學習 Self-directed Learning",
+                    3000,
+                    "學習歷程 Learning Portfolio",
+                    3000,
+                  ]}
+                  speed={50}
+                  wrapper="span"
+                  cursor={true}
+                  repeat={Infinity}
+                  className="mx-auto font-press-start font-semibold text-4xl  mb-20"
+                />
+                {/* <img src='images/login.png' width={'600px'} alt='I am B' /> */}
+                <Lottie className="w-96" animationData={Login_icon} />
+
                 </div>
             </div>
         <div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-16 xl:pr-80 flex items-center justify-center">

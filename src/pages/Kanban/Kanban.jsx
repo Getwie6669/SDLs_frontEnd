@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiPlus } from "react-icons/fi";
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,7 @@ import { FaPlus } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable as Droppable } from '../../utils/StrictModeDroppable';
-import SubStageComponent from '../../components/SubStageBar'; 
+import SubStageComponent from '../../components/SubStageBar';
 
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getKanbanColumns, getKanbanTasks, addCardItem } from '../../api/kanban';
@@ -91,35 +91,67 @@ export default function Kanban() {
     }
   }, [localStorage.getItem("currentStage"), localStorage.getItem("currentSubStage")])
 
-  const onDragEnd = (result) => {
-    const { destination, source, type } = result;
-    // 拖放被取消（例如，拖放到了非法区域）
-    if (!destination) {
-      return;
-    }
+  // const onDragEnd = (result) => {
+  //   const { destination, source, type } = result;
+  //   // 拖放被取消（例如，拖放到了非法区域）
+  //   if (!destination) {
+  //     return;
+  //   }
 
-    // 拖放结束位置与开始位置相同
+  //   // 拖放结束位置与开始位置相同
+  //   if (
+  //     destination.droppableId === source.droppableId &&
+  //     destination.index === source.index
+  //   ) {
+  //     return;
+  //   }
+  //   // 处理列的拖放逻辑
+  //   if (type === 'COLUMN') {
+  //     const newKanbanData = Array.from(kanbanData);
+  //     const [reorderedColumn] = newKanbanData.splice(source.index, 1);
+  //     newKanbanData.splice(destination.index, 0, reorderedColumn);
+
+  //     setKanbanData(newKanbanData);
+  //   } else if (type === 'CARD') {
+  //     socket.emit('cardItemDragged', {
+  //       destination,
+  //       source,
+  //       kanbanData
+  //     })
+  //   }
+  // }
+
+
+  const onDragEnd = useCallback((result) => {
+    const { destination, source, type } = result;
+    if (!destination) return;
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
       return;
     }
-    // 处理列的拖放逻辑
     if (type === 'COLUMN') {
       const newKanbanData = Array.from(kanbanData);
       const [reorderedColumn] = newKanbanData.splice(source.index, 1);
       newKanbanData.splice(destination.index, 0, reorderedColumn);
 
       setKanbanData(newKanbanData);
+      // socket.emit('cardItemDragged', {
+      //   destination,
+      //   source,
+      //   newKanbanData
+      // })
     } else if (type === 'CARD') {
       socket.emit('cardItemDragged', {
         destination,
         source,
         kanbanData
       })
+      // setKanbanData(newKanbanData);
+
     }
-  }
+  }, [kanbanData]);
 
   const handleChange = (e) => {
     setNewCard(e.target.value);
@@ -192,11 +224,11 @@ export default function Kanban() {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex space-x-4 overflow-x-auto" // 添加 overflow-x-auto 以启用水平滚动
+                className="flex space-x-4 overflow-x-auto " // 添加 overflow-x-auto 以启用水平滚动
                 style={{ display: 'inline-flex', flexDirection: 'row', paddingBottom: '1rem' }} // 确保列是水平排列的，并且底部有足够空间
               >
                 {!showAddGroupInput && (
-                  <button style={{ backgroundColor: "#5BA491" }} className="w-60 h-24 flex flex-row items-center rounded-lg border-none p-7" onClick={toggleAddGroupInput}>
+                  <button  className="bg-[#5BA491] hover:bg-[#5BA491]/90 w-60 h-24 flex flex-row items-center rounded-lg border-none p-7" onClick={toggleAddGroupInput}>
                     <FaPlus className="text-white m-3" />
                     <b className="text-base text-white">
                       新增列表
@@ -217,9 +249,8 @@ export default function Kanban() {
                       />
                       <div className='flex justify-start items-center'>
                         <button
-                          style={{ backgroundColor: "#5BA491" }}
                           onClick={handleAddGroup}
-                          className="p-2 text-sm text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300"
+                          className="bg-[#5BA491] hover:bg-[#5BA491]/80 p-2 text-sm text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300"
                         >
                           新增列表
                         </button>
@@ -265,23 +296,23 @@ export default function Kanban() {
                                             column.task.map((item, index) => (
 
 
-                                              <Draggable draggableId={item.id.toString()} index={index} key={item.id}>
-                                                {(provided) => (
-                                                  <div
-                                                    className="item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg "
-                                                    {...provided.dragHandleProps}
-                                                    {...provided.draggableProps}
-                                                    ref={provided.innerRef}
-                                                  >
+                                              // <Draggable draggableId={item.id.toString()} index={index} key={item.id}>
+                                              //   {(provided) => (
+                                              //     <div
+                                              //       // className="item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg "
+                                              //       // {...provided.dragHandleProps}
+                                              //       {...provided.draggableProps}
+                                              //       ref={provided.innerRef}
+                                              //     >
                                                     <Carditem
                                                       key={item.id}
                                                       index={index}
                                                       data={item}
                                                       columnIndex={columnIndex}
                                                     />
-                                                  </div>
-                                                )}
-                                              </Draggable>
+                                                //   </div>
+                                                // )}
+                                              // </Draggable>
 
 
                                             ))}
@@ -323,9 +354,8 @@ export default function Kanban() {
                                 ) : (
                                   <div className="flex justify-start px-4">
                                     <button
-                                      style={{ backgroundColor: "#5BA491" }}
                                       onClick={() => { setSelectedcolumn(columnIndex); setShowForm(true); }}
-                                      className="text-sm p-2 mb-2 text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300"
+                                      className="bg-[#5BA491] hover:bg-[#5BA491]/80 text-sm p-2 mb-2 text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300"
                                     >
                                       新增卡片
                                     </button>
@@ -350,8 +380,9 @@ export default function Kanban() {
           <p className="text-lg font-semibold">{stageInfo.name}</p>
         </div>
       </div> */}
-      
+
       {/* <SubStageComponent /> */}
     </div >
   )
 }
+

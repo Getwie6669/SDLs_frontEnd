@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 
 const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
     const [animationClass, setAnimationClass] = useState('');
@@ -108,7 +108,10 @@ const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
         // setImageSrc('/robot.png'); 
     };
 
+
+    
     if (!isOpen && animationClass.includes('opacity-0')) return null;
+
 
     return (
         <div className={`absolute right-0 bottom-0 mb-28 rounded-lg mr-40 transform transition-all duration-500 ease-in-out ${animationClass} shadow-2xl dialog-box`}>
@@ -165,6 +168,7 @@ export default function SubStageComponent() {
     const [imageSrc, setImageSrc] = useState('/robot.png');
     const [isHovered, setIsHovered] = useState(false);
     const [ignoreHover, setIgnoreHover] = useState(false); // 新增狀態
+    const dialogRef = useRef(); // 使用 useRef 創建一個 ref 來引用 DialogBox
 
     const handleRobotClick = () => {
         document.body.style.overflow = 'hidden'; // 開啟DialogBox時禁止滾動
@@ -206,10 +210,27 @@ export default function SubStageComponent() {
         setIsHovered(false)
     }
 
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+                handleCloseDialog()
+            }
+        }
+
+        // 只有當 DialogBox 是開啟的時候才添加事件監聽器
+        if (isDialogOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            // 清理函數：移除事件監聽器
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isDialogOpen]); // 依賴於 isDialogOpen 的變化來重新添加/移除事件監聽器
 
     return (
         <div style={{ width: 'calc(100% - 4rem)' }} className="w-full max-w-screen bg-[#F5F5F5] absolute bottom-0 right-0 h-16 duration-500 border-r-2 pb-20 px-40">
-            <div className="flex justify-evenly items-center p-4">
+            <div className="flex justify-evenly items-center p-4" ref={dialogRef}>
                 {stages.map((subStage, index) => (
                     <React.Fragment key={index}>
                         <div style={{ backgroundColor: getStageColor(index + 1) }} className={`px-4 py-3 ${getTextColor(index + 1)} font-semibold rounded-lg shadow-inner`}>
