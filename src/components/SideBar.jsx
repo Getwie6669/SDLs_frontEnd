@@ -11,11 +11,90 @@ import { BsBezier2, BsChatText, BsJournalText, BsFolder } from "react-icons/bs";
 import { GrCompliance } from "react-icons/gr";
 import { BiTask } from "react-icons/bi";
 import { BsChatDots } from "react-icons/bs";
-import { AnimatePresence, motion } from "framer-motion";
-
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 
 import ChatRoom from './ChatRoom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
+
+
+
+const AnimatedHamburgerButton = () => {
+    const [active, setActive] = useState(false);
+    return (
+      <MotionConfig
+        transition={{
+          duration: 0.5,
+          ease: "easeInOut",
+        }}
+      >
+        <motion.button
+          initial={false}
+          animate={active ? "open" : "closed"}
+          onClick={() => setActive((pv) => !pv)}
+          className="relative h-8 w-8 transition-colors hover:bg-white/20"
+        >
+          <motion.span
+            variants={VARIANTS.top}
+            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+            style={{ y: "-50%", left: "50%", x: "-50%", top: "25%" }}
+          />
+          <motion.span
+            variants={VARIANTS.middle}
+            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+            style={{ left: "50%", x: "-50%", top: "50%", y: "-50%" }}
+          />
+          <motion.span
+            variants={VARIANTS.bottom}
+            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+            style={{
+              x: "-50%",
+              y: "50%",
+              bottom: "25%",
+              left: "50%",  // 将left修改为50%，确保与中间线条对齐
+            }}
+          />
+        </motion.button>
+      </MotionConfig>
+    );
+};
+
+
+  
+const VARIANTS = {
+    top: {
+      open: {
+        rotate: ["0deg", "0deg", "45deg"],
+        top: ["25%", "50%", "50%"],
+      },
+      closed: {
+        rotate: ["45deg", "0deg", "0deg"],
+        top: ["50%", "50%", "25%"],
+      },
+    },
+    middle: {
+      open: {
+        rotate: ["0deg", "0deg", "-45deg"],
+      },
+      closed: {
+        rotate: ["-45deg", "0deg", "0deg"],
+      },
+    },
+    bottom: {
+      open: {
+        rotate: ["0deg", "0deg", "45deg"],
+        bottom: ["25%", "50%", "50%"],
+        left: "50%",  // 在打开状态下对齐
+      },
+      closed: {
+        rotate: ["45deg", "0deg", "0deg"],
+        bottom: ["50%", "50%", "25%"],
+        left: "50%",  // 确保在关闭状态下与其他线条完美对齐
+      },
+    },
+  };
+
+  
+  
 
 export default function SideBar() {
     const [open, setOpen] = useState(false);
@@ -94,8 +173,8 @@ export default function SideBar() {
             <div className={` z-10 bg-[#FFF] absolute inset-y-0 pt-16 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-40" : "w-16"}`}>
                 <div className='flex flex-col justify-between h-full'>
                     <div>
-                        <div className='mt-2 mb-2 pt-3 pl-3 flex justify-start'>
-                            <FaBars size={26} className='cursor-pointer ml-1' onClick={() => setOpen(!open)} />
+                        <div className={`my-2  flex ${open ? "justify-end mr-2" : "justify-center"}`} onClick={() => setOpen(!open)}>
+                            <AnimatedHamburgerButton size={26} className='cursor-pointer ml-1' />
                         </div>
                         <div className=' flex flex-col  relative'>
 
@@ -121,7 +200,6 @@ export default function SideBar() {
                             {
                                 projectId && (
                                     <div className={`mt-auto mb-4 transition-all duration-500 w-full overflow-hidden pt-4`}>
-                                        {/* 方塊區塊 */}
                                         <div className={`flex flex-col space-y-2`}>
                                             {stages.map((stage) => (
                                                 <div key={stage.index} style={{ backgroundColor: `${getStageColor(stage.index)}` }} className={`h-8 w-full flex items-center justify-center ${getTextColor(stage.index)}`}>
