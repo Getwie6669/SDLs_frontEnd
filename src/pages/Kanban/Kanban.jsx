@@ -27,6 +27,11 @@ export default function Kanban() {
   const navigate = useNavigate();
   const [showAddGroupInput, setShowAddGroupInput] = useState(false); // 新增狀態
   const [newGroupName, setNewGroupName] = useState('');
+  const currentStage = localStorage.getItem("currentStage");
+  const currentSubStage = localStorage.getItem("currentSubStage");
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [isError, setIsError] = useState(false);
+  // const [error, setError] = useState(null);
 
   const {
     isLoading: kanbanIsLoading,
@@ -40,6 +45,25 @@ export default function Kanban() {
       onSuccess: setKanbanData
     }
   );
+
+  //   useEffect(() => {
+  //     const fetchKanbanData = async () => {
+  //       setIsLoading(true); // 开始加载数据
+  //       setIsError(false); // 重置错误状态
+  //       setError(null); // 清除之前的错误信息
+  //       try {
+  //         const updatedKanbanData = await getKanbanColumns(projectId);
+  //         setKanbanData(updatedKanbanData);
+  //         setIsLoading(false); // 加载完成
+  //       } catch (error) {
+  //         console.error("获取看板列数据失败:", error);
+  //         setError(error); // 设置错误信息
+  //         setIsError(true); // 标记错误状态
+  //         setIsLoading(false); // 加载完成
+  //       }
+  //     };
+  //     fetchKanbanData();
+  // }, [projectId]);
 
   const getSubStageQuery = useQuery("getSubStage", () => getSubStage({
     projectId: projectId,
@@ -86,10 +110,10 @@ export default function Kanban() {
   }, [socket]);
 
   useEffect(() => {
-    if (!localStorage.getItem("currentStage") || !localStorage.getItem("currentSubStage")) {
+    if (!currentStage || !currentSubStage) {
       navigate(0);
     }
-  }, [localStorage.getItem("currentStage"), localStorage.getItem("currentSubStage")])
+  }, [currentStage, currentSubStage, navigate])
 
   // const onDragEnd = (result) => {
   //   const { destination, source, type } = result;
@@ -211,6 +235,7 @@ export default function Kanban() {
       console.log(kanbanData)
     }
   };
+
   return (
     <div style={{ display: 'inline-flex' }} className="layout__wrapper min-w-full h-full bg-white" >
       <div className="card p-8 w-full px-20">
@@ -228,7 +253,7 @@ export default function Kanban() {
                 style={{ display: 'inline-flex', flexDirection: 'row', paddingBottom: '1rem' }} // 确保列是水平排列的，并且底部有足够空间
               >
                 {!showAddGroupInput && (
-                  <button  className="bg-[#5BA491] hover:bg-[#5BA491]/90 w-60 h-24 flex flex-row items-center rounded-lg border-none p-7" onClick={toggleAddGroupInput}>
+                  <button className="bg-[#5BA491] hover:bg-[#5BA491]/90 w-60 h-24 flex flex-row items-center rounded-lg border-none p-7" onClick={toggleAddGroupInput}>
                     <FaPlus className="text-white m-3" />
                     <b className="text-base text-white">
                       新增列表
@@ -304,14 +329,14 @@ export default function Kanban() {
                                               //       {...provided.draggableProps}
                                               //       ref={provided.innerRef}
                                               //     >
-                                                    <Carditem
-                                                      key={item.id}
-                                                      index={index}
-                                                      data={item}
-                                                      columnIndex={columnIndex}
-                                                    />
-                                                //   </div>
-                                                // )}
+                                              <Carditem
+                                                key={item.id}
+                                                index={index}
+                                                data={item}
+                                                columnIndex={columnIndex}
+                                              />
+                                              //   </div>
+                                              // )}
                                               // </Draggable>
 
 

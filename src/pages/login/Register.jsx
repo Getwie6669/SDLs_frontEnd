@@ -118,7 +118,7 @@ export default function Register() {
 
                 </div>
             </div>
-        <div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-16 xl:pr-80 flex items-center justify-center">
+        <div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-16 xl:px-40 flex items-center justify-center">
             <div className="bg-white w-full h-100 rounded-lg p-8 shadow-2xl">
                 <h1 className="text-4xl font-bold mb-6 flex items-center justify-center">Sign up</h1>
                 <form className="mt-6">

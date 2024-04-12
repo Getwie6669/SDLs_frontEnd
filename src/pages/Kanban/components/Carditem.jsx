@@ -65,8 +65,7 @@ function Carditem({ data, index, columnIndex }) {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg ${snapshot.isDragging ? "dragging" : ""
-              }`}
+            className={`item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg ${snapshot.isDragging ? "dragging" : ""}`}
             style={{
               ...provided.draggableProps.style,
               // 添加额外的样式调整，如必要的偏移或其他
