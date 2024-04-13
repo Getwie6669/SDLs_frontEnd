@@ -7,6 +7,9 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import toast, { Toaster } from 'react-hot-toast';
 import Loader from '../../components/Loader';
 import { FaPlus } from "react-icons/fa";
+import personalDailyIcon from "../../assets/AnimationPersonalDaily.json";
+import teamDailyIcon from "../../assets/AnimationTeamDaily.json";
+import Lottie from "lottie-react";
 
 export default function Reflection() {
     const { projectId } = useParams();
@@ -139,9 +142,14 @@ export default function Reflection() {
                         {
                             isLoading ? <Loader /> :
                                 isError ? <p className='text-base font-bold'>{error.message}</p> :
-                                    personalDaily.map((item, index) => {
-                                        console.log(item);
-                                        return (
+                                    personalDaily.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center mx-80">
+                                            <Lottie className="w-64" animationData={personalDailyIcon} />
+                                            <p className=' font-bold text-zinc-600 text-lg'>還沒新增過個人日誌 ! 趕快新增你的第一個個人日誌吧 ~</p>
+                                        </div>
+                                    ) : (
+                                        personalDaily.map((item, index) => (
+                                            
                                             <div className='flex-none mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
                                                 <button onClick={() => {
                                                     setInspectDailyModalOpen(true);
@@ -151,11 +159,10 @@ export default function Reflection() {
                                                     {item.title}
                                                 </button>
                                             </div>
-                                        )
-                                    })
+                                        ))
+                                    )
                         }
                     </div>
-
                 </div>
                 <div className='flex justify-start gap-6 items-center w-full'>
                     <h3 className='text-lg font-bold'>小組日誌</h3>
@@ -170,13 +177,18 @@ export default function Reflection() {
                         <p className="ml-2">新增</p>
                     </button>
                 </div>
-
-                {/* <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700' /> */}
                 <div className='  flex flex-wrap justify-start items-center w-full mb-5'>
                     <div className='flex overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-rounded-full'>
                         {
                             teamDailyQuery.isLoading ? <Loader /> :
                                 teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
+
+                                teamDaily.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center mx-80">
+                                        <Lottie className=" w-72" animationData={personalDailyIcon} />
+                                        <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
+                                    </div>
+                                ) : (
                                     teamDaily.map((item, index) => {
                                         if (item.type === "discuss") {
                                             return (
@@ -192,6 +204,7 @@ export default function Reflection() {
                                             )
                                         } else return
                                     })
+                                )
                         }
                     </div>
                 </div>

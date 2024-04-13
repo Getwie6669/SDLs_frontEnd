@@ -16,7 +16,11 @@ export default function TopBar() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const personImg = [
+    '/public/person/man1.png', '/public/person/man2.png', '/public/person/man3.png',
+    '/public/person/man4.png', '/public/person/man5.png', '/public/person/man6.png',
+    '/public/person/woman1.png', '/public/person/woman2.png', '/public/person/woman3.png'
+  ];
   const getProjectUserQuery = useQuery("getProjectUser", () => getProjectUser(projectId),
     {
       onSuccess: setProjectUsers,
@@ -68,57 +72,50 @@ export default function TopBar() {
           <img src="/SDLS_LOGOO.jpg" alt="Logo" className="h-14 w-auto" />
         </Link>
         <div className="flex items-center">
-          <h3 className="font-bold cursor-pointer p-1 mr-2 rounded-lg">
+          <h3 className="font-bold p-1 mr-2 rounded-lg mx-3">
             {localStorage.getItem("username")}
           </h3>
-          <h3 className="font-bold cursor-pointer p-1 mr-2 hover:bg-slate-100 rounded-lg" onClick={handleLogout}>
+          <button onClick={handleLogout} className='ml-3 bg-gray-100 text-gray-900 hover:bg-gray-200 rounded-md p-2 font-semibold'>
             登出
-          </h3>
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    // <div className='fixed  h-16 w-full pl-20 bg-[#FFFFFF] flex items-center justify-between pr-5 border-b-2'>
     <div className='fixed z-40 h-16 w-full bg-[#FFFFFF] flex items-center justify-between pr-5 border-b-2'>
       <Link to="/homepage" onClick={cleanStage} className="flex px-5 items-center font-bold font-Mulish text-2xl">
-        {/* <img src="/logo.ico" alt="Logo" className="mr-2" /> */}
         <img src="/SDLS_LOGOO.jpg" alt="Logo" className=" h-14 w-auto" />
 
       </Link>
       <div className="flex items-center">
         <ul className="flex items-center justify-center space-x-1">
-          {
-            getProjectUserQuery.isLoading || projectId === undefined ? <></> :
-              getProjectUserQuery.isError ? <p className=' font-bold text-2xl'>{kanbansIsError.message}</p> :
-                projectUsers.map((projectUser, index) => {
-                  return (
-                    <li key={index} className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
-                      {projectUser.username}
-                    </li>
-                  )
-                })
+          {getProjectUserQuery.isLoading || projectId === undefined ? <></> :
+            getProjectUserQuery.isError ? <p className='font-bold text-2xl'>Error</p> :
+              projectUsers.map((projectUser, index) => {
+                const imgIndex = parseInt(projectUser.id) % 9;
+                const userImg = personImg[imgIndex];
+                return (
+                  <li key={index} className="w-8 h-8 overflow-hidden rounded-full shadow-xl ">
+                    <img src={userImg} alt="Person" className="w-full h-full object-cover" title={projectUser.username} />
+                  </li>
+                )
+              })
           }
           <li>
-            <button
-              className="flex items-center w-9 h-9 justify-center">
-              <BsPlusCircleDotted
-                size={32}
-                className=" text-gray-500"
-                onClick={() => setReferralCodeModalOpen(true)}
-              />
+            <button className="p-1 rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <BsPlusCircleDotted size={32} onClick={() => setReferralCodeModalOpen(true)} />
             </button>
           </li>
         </ul>
 
-        <IoIosNotificationsOutline size={30} className='cursor-pointer mx-3' />
-        <h3 className="font-bold cursor-pointer p-1 mr-2 rounded-lg">
+        <h3 className="font-bold cursor-pointer p-1 mr-2 rounded-lg mx-3">
           {localStorage.getItem("username")}
         </h3>
-        <h3 className="font-bold cursor-pointer p-1 mr-2 hover:bg-slate-100 rounded-lg" onClick={handleLogout}>
+        <button onClick={handleLogout} className='ml-3 bg-gray-100 text-gray-900 hover:bg-gray-200 rounded-md p-2 font-semibold'>
           登出
-        </h3>
+        </button>
       </div>
       <Modal open={referralCodeModalOpen} onClose={() => setReferralCodeModalOpen(false)} opacity={true} position={"justify-center items-center"}>
         <button onClick={() => setReferralCodeModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
