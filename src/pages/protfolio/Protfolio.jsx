@@ -8,6 +8,8 @@ import { useParams } from 'react-router-dom';
 import Loader from '../../components/Loader';
 import FolderModal from './components/folderModal';
 import dateFormat from 'dateformat';
+import ProtfoliioIcon from "../../assets/AnimationProtfoliio.json";
+import Lottie from "lottie-react";
 
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import FileDownload from 'js-file-download';
@@ -76,54 +78,63 @@ export default function Protfolio() {
                             isLoading ? <Loader /> :
                                 isError ? <p className=' font-bold text-2xl'>{isError.message}</p> :
                                     // stagePortfolio.map(item => {
-                                    portfolioItemsWithTitles.map((item, index) => {
-                                        if (item.type === 'title') {
-                                            return (
-                                                <React.Fragment key={`title-${index}`}>
-                                                    <div className="w-full mb-3">
-                                                        <h3 className="text-xl font-bold">{item.content}</h3>
-                                                    </div>
-                                                    <div className="w-full h-0.5 bg-[#5BA491] mb-3 mr-5"></div>
-                                                </React.Fragment>
-                                            );
-                                        } else {
-                                            const { id, stage, createdAt } = item.content;
-                                            const description = stageDescriptions[stage];
-                                            if (!description) return null; // 如果stage不在stageDescriptions中，则不渲染
+                                    portfolioItemsWithTitles.length === 0 ? (
+                                        // 當數據為空時顯示的部分
+                                        <div className="flex flex-col items-center justify-center w-full h-full my-5">
+                                            <Lottie className=" w-96" animationData={ProtfoliioIcon} />
+                                            <p className="text-lg text-zinc-600 font-bold mt-2">目前還未新增歷程檔案，快和小組成員互相討論並記錄討論結果吧 !</p>
+                                        </div>
+                                    ) : (
+
+                                        portfolioItemsWithTitles.map((item, index) => {
+                                            if (item.type === 'title') {
+                                                return (
+                                                    <React.Fragment key={`title-${index}`}>
+                                                        <div className="w-full mb-3">
+                                                            <h3 className="text-xl font-bold">{item.content}</h3>
+                                                        </div>
+                                                        <div className="w-full h-0.5 bg-[#5BA491] mb-3 mr-5"></div>
+                                                    </React.Fragment>
+                                                );
+                                            } else {
+                                                const { id, stage, createdAt } = item.content;
+                                                const description = stageDescriptions[stage];
+                                                if (!description) return null; // 如果stage不在stageDescriptions中，则不渲染
 
 
-                                            const isActive = id === activeItemId;
-                                            return (
-                                                <div
-                                                    className={`flex mx-3 mb-3 transition duration-500 ease-in-out transform ${isActive ? 'scale-105 bg-[#487e6c]' : 'bg-[#5BA491]'} rounded-lg`}
-                                                    key={id}
-                                                    style={{
-                                                        minWidth: 'calc(33.333% - 2rem)', maxWidth: 'calc(33.333% - 2rem)'
-                                                    }}
-                                                >
-                                                    <button
-                                                        className="inline-flex items-center justify-center w-full h-28  text-white  font-semibold rounded-lg p-5 mx-5 text-base flex-col"
-                                                        onClick={() => {
-                                                            setActiveItemId(id);
-                                                            setFolderModalOpen(true);
-                                                            setModalData(item.content);
-                                                            console.log(item);
+                                                const isActive = id === activeItemId;
+                                                return (
+                                                    <div
+                                                        className={`flex mx-3 mb-3 transition duration-500 ease-in-out transform ${isActive ? 'scale-105 bg-[#487e6c]' : 'bg-[#5BA491]'} rounded-lg`}
+                                                        key={id}
+                                                        style={{
+                                                            minWidth: 'calc(33.333% - 2rem)', maxWidth: 'calc(33.333% - 2rem)'
                                                         }}
                                                     >
-                                                        <div className="flex items-center justify-center">
-                                                            <AiTwotoneFolderAdd size={30} className="mr-2" />
-                                                            {/* <span>{stage}</span> */}
-                                                            <span className="ml-2 text-lg">{description}</span>
-                                                        </div>
-                                                        <div className="mt-5 text-sm text-white">
-                                                            <span className='mr-2'>完成時間</span>
-                                                            {dateFormat(createdAt, "yyyy/mm/dd")}
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                            )
-                                        }
-                                    })
+                                                        <button
+                                                            className="inline-flex items-center justify-center w-full h-28  text-white  font-semibold rounded-lg p-5 mx-5 text-base flex-col"
+                                                            onClick={() => {
+                                                                setActiveItemId(id);
+                                                                setFolderModalOpen(true);
+                                                                setModalData(item.content);
+                                                                console.log(item);
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center justify-center">
+                                                                <AiTwotoneFolderAdd size={30} className="mr-2" />
+                                                                {/* <span>{stage}</span> */}
+                                                                <span className="ml-2 text-lg">{description}</span>
+                                                            </div>
+                                                            <div className="mt-5 text-sm text-white">
+                                                                <span className='mr-2'>完成時間</span>
+                                                                {dateFormat(createdAt, "yyyy/mm/dd")}
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                )
+                                            }
+                                        })
+                                    )
                             // })
                         }
                     </div>
