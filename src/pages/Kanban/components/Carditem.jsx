@@ -26,6 +26,11 @@ function Carditem({ data, index, columnIndex }) {
     "labels": [],
     "assignees": []
   })
+  const personImg = [
+    '/public/person/man1.png', '/public/person/man2.png', '/public/person/man3.png',
+    '/public/person/man4.png', '/public/person/man5.png', '/public/person/man6.png',
+    '/public/person/woman1.png', '/public/person/woman2.png', '/public/person/woman3.png'
+  ];
   const [menberData, setMenberData] = useState([]);
   const [labelData, setLabelData] = useState([]);
 
@@ -76,11 +81,14 @@ function Carditem({ data, index, columnIndex }) {
               <FiEdit onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer' />
             </div>
             <div className="flex justify-end items-center space-x-1">
-              {data.assignees && data.assignees.map((assignee, index) => (
-                <div key={index} className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
-                  {assignee.username}
-                </div>
-              ))}
+              {data.assignees && data.assignees.map((assignee, index) => {
+                const imgIndex = parseInt(assignee.id) % 9;
+                const userImg = personImg[imgIndex];
+                return (
+                  <img src={userImg} alt="Person" className="w-8 h-8 my-1 overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index}/>
+                )
+
+              })}
             </div>
 
             <div>
@@ -128,10 +136,10 @@ function Carditem({ data, index, columnIndex }) {
               />
             </div>
             <div className='flex flex-col w-1/3 ml-4'>
-              <button onClick={() => setTagModalOpen(true)} className="flex justify-start items-center w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60">
+              {/* <button onClick={() => setTagModalOpen(true)} className="flex justify-start items-center w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60">
                 <AiOutlineTag className='w-3 h-3 sm:w-5 sm:h-5 mx-2 text-black' />
                 標籤
-              </button>
+              </button> */}
               <button onClick={() => setAssignMemberModalOpen(true)} className="flex justify-start items-center w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60">
                 <BsFillPersonFill className='w-3 h-3 sm:w-5 sm:h-5 mx-2 text-black' />
                 指派成員
@@ -140,7 +148,7 @@ function Carditem({ data, index, columnIndex }) {
           </div>
           <div className='flex justify-between mt-2'>
             <div className='flex flex-col w-1/3'>
-              <p className="flex justify-start items-center w-full h-7 m-1 font-bold text-sm sm:text-base text-black/60 ">
+              {/* <p className="flex justify-start items-center w-full h-7 m-1 font-bold text-sm sm:text-base text-black/60 ">
                 標籤
               </p>
               {
@@ -152,7 +160,7 @@ function Carditem({ data, index, columnIndex }) {
                     </div>
                   )
                 })
-              }
+              } */}
               <p className="flex justify-start items-center w-full h-7 m-1 font-bold text-sm sm:text-base text-black/60">
                 指派成員
               </p>
@@ -160,10 +168,10 @@ function Carditem({ data, index, columnIndex }) {
                 {
                   cardData.assignees &&
                   cardData.assignees.map((assignee, index) => {
+                    const imgIndex = parseInt(assignee.id) % 9;
+                    const userImg = personImg[imgIndex];
                     return (
-                      <div key={index} className={`w-8 h-8 border-[1px] border-slate-400 bg-slate-100 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
-                        {assignee.username}
-                      </div>
+                      <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index}/>
                     )
                   })
                 }
@@ -187,14 +195,14 @@ function Carditem({ data, index, columnIndex }) {
         </Modal>
       }
       {/* tag modal */}
-      {
+      {/* {
         <Modal open={tagModalopen} onClose={() => setTagModalOpen(false)} opacity={false} position={"justify-end items-center m-3"}>
           <button onClick={() => setTagModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
             <GrFormClose className=' w-6 h-6' />
           </button>
           <ColorPicker />
         </Modal>
-      }
+      } */}
       {/* AssignMember modal */}
       {
         <Modal open={assignMemberModalopen} onClose={() => setAssignMemberModalOpen(false)} opacity={false} position={"justify-end items-center m-3"}>

@@ -23,14 +23,27 @@ export default function Register() {
         }));
     }
 
+    // const validateInput = () => {
+    //     if (isFormSubmitted && !userData.confirmPassword) {
+    //         setError("請確認密碼");
+    //     } else if (userData.confirmPassword !== userData.password) {
+    //         setError("密碼不相符");
+    //     } else {
+    //         setError("");
+    //     }
+    // };
     const validateInput = () => {
-        if (isFormSubmitted && !userData.confirmPassword) {
-            setError("請確認密碼");
-        } else if (userData.confirmPassword !== userData.password) {
-            setError("密碼不相符");
-        } else {
-            setError("");
+        if (isFormSubmitted) {
+            if (!userData.confirmPassword) {
+                setError("請確認密碼");
+                return false; // 表示存在错误
+            } else if (userData.confirmPassword !== userData.password) {
+                setError("密碼不相符");
+                return false; // 表示存在错误
+            }
         }
+        setError(""); // 无错误
+        return true; // 表示无错误
     };
 
     const userRegisterMutation = useMutation(userRegister, {
@@ -89,8 +102,8 @@ export default function Register() {
     const handleSubmit = (e) =>{
         e.preventDefault()
         setIsFormSubmitted(true);
-        validateInput();
-        if (!error) {
+        const isValid = validateInput(); // 获取验证结果
+        if (isValid) {
             userRegisterMutation.mutate(userData);
         }
     };

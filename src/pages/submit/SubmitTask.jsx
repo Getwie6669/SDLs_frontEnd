@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { submitTask } from '../../api/submit';
 import { useNavigate , useParams } from 'react-router-dom';
@@ -6,6 +6,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { getSubStage } from '../../api/stage';
 import CommonInput from './components/CommonInput';
 import Loader from '../../components/Loader';
+import { socket } from '../../utils/Socket';
 
 export default function SubmitTask() {
     const [ taskData, setTaskData ] = useState({});
@@ -82,7 +83,16 @@ export default function SubmitTask() {
     }
     const errorNotify = (toastContent) => toast.error(toastContent);
     const sucesssNotify = (toastContent) => toast.success(toastContent);
+    // socket
+    useEffect(() => {
 
+        socket.connect();
+        // socket.on("receive_message", receive_message);
+
+        // return () => {
+        //     socket.disconnect();
+        // }
+    }, [socket])
     return (
         localStorage.getItem('stageEnd') ? 
         <div className='flex my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center'>

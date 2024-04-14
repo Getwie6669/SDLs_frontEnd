@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect  } from 'react'
 import Modal from '../../components/Modal'
 import { GrFormClose } from "react-icons/gr";
 import { useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { FaPlus } from "react-icons/fa";
 import personalDailyIcon from "../../assets/AnimationPersonalDaily.json";
 import teamDailyIcon from "../../assets/AnimationTeamDaily.json";
 import Lottie from "lottie-react";
+import { socket } from '../../utils/Socket';
 
 export default function Reflection() {
     const { projectId } = useParams();
@@ -126,6 +127,21 @@ export default function Reflection() {
 
     const errorNotify = (toastContent) => toast.error(toastContent);
     const sucesssNotify = (toastContent) => toast.success(toastContent);
+
+
+    
+    // socket
+    useEffect(() => {
+
+        socket.connect();
+        // socket.on("receive_message", receive_message);
+
+        // return () => {
+        //     socket.disconnect();
+        // }
+    }, [socket])
+
+
     return (
         <div className='min-w-full min-h-screen h-screen'>
             <div className='flex flex-col my-5 pl-20 pr-5 py-16 w-full h-screen justify-start items-start'>

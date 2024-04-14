@@ -104,7 +104,9 @@ export default function Kanban() {
     return () => {
       socket.off('taskItems', KanbanUpdateEvent);
       socket.off('taskItem', KanbanUpdateEvent);
-      socket.disconnect();
+      socket.off("dragtaskItem", kanbanDragEvent);
+
+      // socket.disconnect();
       // socket.off('taskItem', KanbanUpdateEvent);
     };
   }, [socket]);

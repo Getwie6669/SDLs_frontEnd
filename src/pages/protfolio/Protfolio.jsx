@@ -10,6 +10,7 @@ import FolderModal from './components/folderModal';
 import dateFormat from 'dateformat';
 import ProtfoliioIcon from "../../assets/AnimationProtfoliio.json";
 import Lottie from "lottie-react";
+import { socket } from '../../utils/Socket';
 
 import { AiOutlineCloudDownload } from "react-icons/ai";
 import FileDownload from 'js-file-download';
@@ -67,6 +68,15 @@ export default function Protfolio() {
             FileDownload(blob, "downloaded-file.png"); // 请根据实际文件类型调整 MIME 类型和文件名
         }
     };
+    // socket
+    useEffect(() => {
+        socket.connect();
+        // socket.on("receive_message", receive_message);
+
+        // return () => {
+        //     socket.disconnect();
+        // }
+    }, [socket])
 
     return (
         <div className='min-w-full min-h-screen h-screen'>

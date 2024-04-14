@@ -8,6 +8,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { GrFormClose } from "react-icons/gr";
 import Modal from './Modal';
 import Swal from 'sweetalert2';
+import { socket } from '../utils/Socket';
 
 export default function TopBar() {
   const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
@@ -58,6 +59,7 @@ export default function TopBar() {
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.clear();
+        socket.disconnect();
         navigate("/");
       }
     });

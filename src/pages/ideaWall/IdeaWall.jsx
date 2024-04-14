@@ -90,7 +90,9 @@ export default function IdeaWall() {
         socket.connect();
         socket.on("nodeUpdated", nodeUpdateEvent);
         return () => {
-            socket.disconnect();
+            socket.off("nodeUpdated", nodeUpdateEvent);
+
+            // socket.disconnect();
         }
     }, [socket])
 
