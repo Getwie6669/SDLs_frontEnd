@@ -43,7 +43,7 @@ function Carditem({ data, index, columnIndex }) {
   );
 
   useEffect(() => {
-    console.log('Initial data passed to Carditem:', data);
+    // console.log('Initial data passed to Carditem:', data);
     setCardData(data);
   }, [data])
 

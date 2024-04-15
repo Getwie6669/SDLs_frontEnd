@@ -218,7 +218,7 @@ export default function SideBar() {
                                 <div className='ml-1'>
                                     <BsChatDots size={"26"} className={"text-white"} />
                                 </div>
-                                <h2 style={{ transitionDelay: "700ms", }} className={`whitespace-pre text-sm duration-500 ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
+                                <h2  className={`whitespace-pre text-sm  ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
                                     聊天室
                                 </h2>
                                 <h2 className={`${open && 'hidden'} absolute left-14 bg-white font-semibold text-sm whitespace-pre rounded-md drop-shadow-lg p-0 w-0  overflow-hidden `}>

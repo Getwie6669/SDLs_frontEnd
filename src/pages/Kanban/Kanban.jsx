@@ -10,7 +10,7 @@ import { RxCross2 } from "react-icons/rx";
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable as Droppable } from '../../utils/StrictModeDroppable';
 import SubStageComponent from '../../components/SubStageBar';
-
+import Swal from 'sweetalert2';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getKanbanColumns, getKanbanTasks, addCardItem } from '../../api/kanban';
 import { getSubStage } from '../../api/stage';
@@ -29,9 +29,7 @@ export default function Kanban() {
   const [newGroupName, setNewGroupName] = useState('');
   const currentStage = localStorage.getItem("currentStage");
   const currentSubStage = localStorage.getItem("currentSubStage");
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [isError, setIsError] = useState(false);
-  // const [error, setError] = useState(null);
+
 
   const {
     isLoading: kanbanIsLoading,
@@ -45,25 +43,6 @@ export default function Kanban() {
       onSuccess: setKanbanData
     }
   );
-
-  //   useEffect(() => {
-  //     const fetchKanbanData = async () => {
-  //       setIsLoading(true); // 开始加载数据
-  //       setIsError(false); // 重置错误状态
-  //       setError(null); // 清除之前的错误信息
-  //       try {
-  //         const updatedKanbanData = await getKanbanColumns(projectId);
-  //         setKanbanData(updatedKanbanData);
-  //         setIsLoading(false); // 加载完成
-  //       } catch (error) {
-  //         console.error("获取看板列数据失败:", error);
-  //         setError(error); // 设置错误信息
-  //         setIsError(true); // 标记错误状态
-  //         setIsLoading(false); // 加载完成
-  //       }
-  //     };
-  //     fetchKanbanData();
-  // }, [projectId]);
 
   const getSubStageQuery = useQuery("getSubStage", () => getSubStage({
     projectId: projectId,
@@ -100,14 +79,17 @@ export default function Kanban() {
     socket.on("taskItems", KanbanUpdateEvent);
     socket.on("taskItem", KanbanUpdateEvent);
     socket.on("dragtaskItem", kanbanDragEvent);
-
+    socket.on("columnOrderUpdated", kanbanDragEvent);
+    socket.on("ColumnCreatedSuccess", KanbanUpdateEvent);
+    socket.on("columnDeleted", KanbanUpdateEvent);
     return () => {
       socket.off('taskItems', KanbanUpdateEvent);
       socket.off('taskItem', KanbanUpdateEvent);
       socket.off("dragtaskItem", kanbanDragEvent);
+      socket.off("columnOrderUpdated", kanbanDragEvent);
+      socket.off('ColumnCreatedSuccess', KanbanUpdateEvent);
+      socket.off('columnDeleted', KanbanUpdateEvent);
 
-      // socket.disconnect();
-      // socket.off('taskItem', KanbanUpdateEvent);
     };
   }, [socket]);
 
@@ -116,36 +98,6 @@ export default function Kanban() {
       navigate(0);
     }
   }, [currentStage, currentSubStage, navigate])
-
-  // const onDragEnd = (result) => {
-  //   const { destination, source, type } = result;
-  //   // 拖放被取消（例如，拖放到了非法区域）
-  //   if (!destination) {
-  //     return;
-  //   }
-
-  //   // 拖放结束位置与开始位置相同
-  //   if (
-  //     destination.droppableId === source.droppableId &&
-  //     destination.index === source.index
-  //   ) {
-  //     return;
-  //   }
-  //   // 处理列的拖放逻辑
-  //   if (type === 'COLUMN') {
-  //     const newKanbanData = Array.from(kanbanData);
-  //     const [reorderedColumn] = newKanbanData.splice(source.index, 1);
-  //     newKanbanData.splice(destination.index, 0, reorderedColumn);
-
-  //     setKanbanData(newKanbanData);
-  //   } else if (type === 'CARD') {
-  //     socket.emit('cardItemDragged', {
-  //       destination,
-  //       source,
-  //       kanbanData
-  //     })
-  //   }
-  // }
 
 
   const onDragEnd = useCallback((result) => {
@@ -163,18 +115,17 @@ export default function Kanban() {
       newKanbanData.splice(destination.index, 0, reorderedColumn);
 
       setKanbanData(newKanbanData);
-      // socket.emit('cardItemDragged', {
-      //   destination,
-      //   source,
-      //   newKanbanData
-      // })
+      socket.emit('columnOrderChanged', {
+        kanbanData: newKanbanData,
+        kanbanId: projectId
+      });
+
     } else if (type === 'CARD') {
       socket.emit('cardItemDragged', {
         destination,
         source,
         kanbanData
       })
-      // setKanbanData(newKanbanData);
 
     }
   }, [kanbanData]);
@@ -195,7 +146,6 @@ export default function Kanban() {
         labels: [],
         assignees: []
       }
-      // addKanbanMutation.mutate({item})
       socket.emit("taskItemCreated", {
         selectedcolumn,
         item,
@@ -220,8 +170,6 @@ export default function Kanban() {
       });
       socket.on("ColumnCreatedSuccess", async () => {
         // 使与看板数据相关的查询失效，以触发重新获取
-        // queryClient.invalidateQueries(['kanbanDatas', projectId])
-
         try {
           const updatedKanbanData = await getKanbanColumns(projectId);
           console.log("updatedKanbanData:", updatedKanbanData)
@@ -234,10 +182,29 @@ export default function Kanban() {
         setShowAddGroupInput(false);
       });
 
-      console.log(kanbanData)
     }
   };
-
+  const handleDeleteColumn = (columnData) => {
+    Swal.fire({
+      title: "刪除",
+      text: "列表中的卡片將一併刪除，確定要刪除嗎?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#5BA491",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "確定",
+      cancelButtonText: "取消"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log(columnData)
+        socket.emit("ColumnDelete", {
+          columnData,
+          kanbanId: projectId
+        });
+      }
+    });
+  }
+  
   return (
     <div style={{ display: 'inline-flex' }} className="layout__wrapper min-w-full h-full bg-white" >
       <div className="card p-8 w-full px-20">
@@ -307,11 +274,18 @@ export default function Kanban() {
                             >
                               <div
                                 {...provided.dragHandleProps}
-                                className="store-container  p-3 rounded-lg cursor-move "
-                              >
+                                className="store-container p-3 rounded-lg cursor-move flex justify-between items-center"
+                                >
                                 <h3 style={{ color: "#5BA491" }} className="text-lg font-semibold">
                                   {column.name}
                                 </h3>
+                                <button
+                                  onClick={() => handleDeleteColumn(column)}
+                                  className="text-[#494b4a] hover:text-[#494b4a]/60"
+                                  title="删除列"
+                                >
+                                  <RxCross2 size={20} />
+                                </button>
                               </div>
                               {
                                 <Droppable droppableId={columnIndex.toString()} type='CARD'>
@@ -321,27 +295,12 @@ export default function Kanban() {
                                         <div className="items-container">
                                           {column.task.length > 0 &&
                                             column.task.map((item, index) => (
-
-
-                                              // <Draggable draggableId={item.id.toString()} index={index} key={item.id}>
-                                              //   {(provided) => (
-                                              //     <div
-                                              //       // className="item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg "
-                                              //       // {...provided.dragHandleProps}
-                                              //       {...provided.draggableProps}
-                                              //       ref={provided.innerRef}
-                                              //     >
                                               <Carditem
                                                 key={item.id}
                                                 index={index}
                                                 data={item}
                                                 columnIndex={column.id}
                                               />
-                                              //   </div>
-                                              // )}
-                                              // </Draggable>
-
-
                                             ))}
                                           {provided.placeholder}
                                         </div>
@@ -354,7 +313,6 @@ export default function Kanban() {
                                 showForm && selectedcolumn === columnIndex ? (
                                   <div className='flex flex-col store-container rounded-lg mb-2 px-4'>
                                     <input
-                                      // className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1"
                                       className='text-sm border border-gray-300 p-2 w-52 rounded-md mb-2'
                                       rows={3}
                                       placeholder="輸入卡片標題..."
@@ -363,7 +321,6 @@ export default function Kanban() {
                                     <div className='flex justify-start items-center'>
                                       <button
                                         style={{ backgroundColor: "#5BA491" }}
-                                        // className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
                                         className='p-2 text-sm text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300'
                                         onClick={handleSubmit}
                                       >
@@ -402,13 +359,7 @@ export default function Kanban() {
           </Droppable>
         </DragDropContext >
       </div>
-      {/* <div className="stage-info-container flex justify-center my-4">
-        <div className="flex flex-col items-center justify-center bg-gray-200 rounded-lg p-4 m-2">
-          <p className="text-lg font-semibold">{stageInfo.name}</p>
-        </div>
-      </div> */}
 
-      {/* <SubStageComponent /> */}
     </div >
   )
 }
