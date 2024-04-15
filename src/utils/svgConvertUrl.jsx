@@ -13,7 +13,7 @@ export default function svgConvertUrl(title,owner,createdAt) {
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "start", alignItems: "start" }}>
                 <div style={{ display: "flex", alignItems: "center"  }}>
                         <img src={stickyNoteBase64} width="100px" alt="" style={{ marginRight: "10px" }} />
-                        <span style={{ fontSize: `48px`, fontWeight: "bold" }}>
+                        <span style={{ fontSize: `48px`, fontWeight: "bold", maxWidth: "300px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {title}
                         </span>
                     </div>

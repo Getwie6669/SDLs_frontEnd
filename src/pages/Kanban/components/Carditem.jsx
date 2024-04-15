@@ -77,8 +77,11 @@ function Carditem({ data, index, columnIndex }) {
             }}
           >
             <div className='flex justify-between'>
-              <span className='flex text-base font-semibold'>{data.title}</span>
+              <p className='text-base font-semibold truncate'style={{ maxWidth: '150px' }}>{data.title}</p>
               <FiEdit onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer' />
+            </div>
+            <div>
+              <p className='truncate'>{data.content}</p>
             </div>
             <div className="flex justify-end items-center space-x-1">
               {data.assignees && data.assignees.map((assignee, index) => {
@@ -91,9 +94,7 @@ function Carditem({ data, index, columnIndex }) {
               })}
             </div>
 
-            <div>
-              <p>{data.content}</p>
-            </div>
+            
           </div>
         )}
       </Draggable>
