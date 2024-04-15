@@ -1,4 +1,4 @@
-import React, { useState,useEffect  } from 'react'
+import React, { useState, useEffect } from 'react'
 import Modal from '../../components/Modal'
 import { GrFormClose } from "react-icons/gr";
 import { useParams } from 'react-router-dom';
@@ -11,6 +11,8 @@ import personalDailyIcon from "../../assets/AnimationPersonalDaily.json";
 import teamDailyIcon from "../../assets/AnimationTeamDaily.json";
 import Lottie from "lottie-react";
 import { socket } from '../../utils/Socket';
+import FileDownload from 'js-file-download';
+import { AiOutlineCloudDownload } from "react-icons/ai";
 
 export default function Reflection() {
     const { projectId } = useParams();
@@ -129,7 +131,7 @@ export default function Reflection() {
     const sucesssNotify = (toastContent) => toast.success(toastContent);
 
 
-    
+
     // socket
     useEffect(() => {
 
@@ -165,7 +167,7 @@ export default function Reflection() {
                                         </div>
                                     ) : (
                                         personalDaily.map((item, index) => (
-                                            
+
                                             <div className='flex-none mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
                                                 <button onClick={() => {
                                                     setInspectDailyModalOpen(true);
@@ -199,28 +201,28 @@ export default function Reflection() {
                             teamDailyQuery.isLoading ? <Loader /> :
                                 teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
 
-                                teamDaily.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center mx-80">
-                                        <Lottie className=" w-72" animationData={personalDailyIcon} />
-                                        <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
-                                    </div>
-                                ) : (
-                                    teamDaily.map((item, index) => {
-                                        if (item.type === "discuss") {
-                                            return (
-                                                <div className='flex mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
-                                                    <button onClick={() => {
-                                                        setInspectDailyModalOpen(true);
-                                                        setSelectedDaily(item)
-                                                    }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
-                                                        <img src="/note.jpg" alt="Daily Thumbnail" className=" w-64 h-44 rounded-t-lg pb-2" />
-                                                        {item.title}
-                                                    </button>
-                                                </div>
-                                            )
-                                        } else return
-                                    })
-                                )
+                                    teamDaily.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center mx-80">
+                                            <Lottie className=" w-72" animationData={personalDailyIcon} />
+                                            <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
+                                        </div>
+                                    ) : (
+                                        teamDaily.map((item, index) => {
+                                            if (item.type === "discuss") {
+                                                return (
+                                                    <div className='flex mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
+                                                        <button onClick={() => {
+                                                            setInspectDailyModalOpen(true);
+                                                            setSelectedDaily(item)
+                                                        }} className="w-full hover:bg-slate-50 text-black border-2 font-semibold rounded-b-lg p-2 text-base rounded-t-lg">
+                                                            <img src="/note.jpg" alt="Daily Thumbnail" className=" w-64 h-44 rounded-t-lg pb-2" />
+                                                            {item.title}
+                                                        </button>
+                                                    </div>
+                                                )
+                                            } else return
+                                        })
+                                    )
                         }
                     </div>
                 </div>
@@ -342,7 +344,7 @@ export default function Reflection() {
                 selectedDaily &&
                 <Modal open={inspectDailyModalOpen} onClose={() => setInspectDailyModalOpen(false)} opacity={true} position={"justify-center items-center"}>
                     <div className='flex flex-col p-3'>
-                        <h3 className=' font-bold text-base mb-3'>檢視日誌</h3>
+                        <h3 className='  font-bold text-lg mb-3 text-center'>檢視日誌</h3>
                         <p className=' font-bold text-base mb-3'>標題</p>
                         <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
                             type="text"
@@ -358,10 +360,28 @@ export default function Reflection() {
                             name='content'
                             value={selectedDaily.content}
                             onChange={handleChangeSelectDaily}
+
                         />
+                        {selectedDaily.fileData && (
+                            <div className='flex justify-between items-center p-3 bg-gray-100 rounded-lg mt-5'>
+                                <span className="font-semibold text-gray-700">附加檔案: {selectedDaily.filename}</span>
+                                <button
+                                    className="flex items-center justify-center px-3 py-1 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out"
+                                    onClick={() => {
+                                        const buffer = new Uint8Array(selectedDaily.fileData.data);
+                                        const blob = new Blob([buffer], { type: "application/octet-stream" });
+                                        FileDownload(blob, selectedDaily.filename);
+                                    }}
+                                >
+                                    <AiOutlineCloudDownload size={24} className="mr-2" />
+                                    下載附件
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <div className='flex justify-end m-2'>
-                        <button onClick={() => setInspectDailyModalOpen(false)} className="mx-auto w-1/3 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-base text-white mr-2" >
+                       
+                        <button onClick={() => setInspectDailyModalOpen(false)} className="inline-flex items-center justify-center px-4 py-2 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out" >
                             關閉
                         </button>
                     </div>
