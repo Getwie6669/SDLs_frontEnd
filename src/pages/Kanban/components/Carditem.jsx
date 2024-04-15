@@ -5,7 +5,7 @@ import AssignMember from './AssignMember';
 import { getProjectUser } from '../../../api/users';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
-
+import Swal from 'sweetalert2';
 import { GrFormClose } from "react-icons/gr";
 import { FiEdit } from "react-icons/fi";
 import { AiOutlineTag } from "react-icons/ai";
@@ -24,7 +24,8 @@ function Carditem({ data, index, columnIndex }) {
     "title": "",
     "content": "",
     "labels": [],
-    "assignees": []
+    "assignees": [],
+    "columnId": ""
   })
   const personImg = [
     '/public/person/man1.png', '/public/person/man2.png', '/public/person/man3.png',
@@ -42,6 +43,7 @@ function Carditem({ data, index, columnIndex }) {
   );
 
   useEffect(() => {
+    console.log('Initial data passed to Carditem:', data);
     setCardData(data);
   }, [data])
 
@@ -50,6 +52,7 @@ function Carditem({ data, index, columnIndex }) {
       setCardData(data);
     };
   }
+
   const cardHandleChange = (e) => {
     const { name, value } = e.target;
     setCardData(prev => ({
@@ -60,6 +63,26 @@ function Carditem({ data, index, columnIndex }) {
   const cardHandleSubmit = () => {
     socket.emit("cardUpdated", { cardData, columnIndex, index });
     setOpen(false);
+  }
+  const cardHandleDelete = () => {
+
+    Swal.fire({
+      title: "刪除",
+      text: "確定要刪除卡片嗎?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#5BA491",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "確定",
+      cancelButtonText: "取消"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        socket.emit("cardDelete", { cardData, columnIndex, index });
+        setOpen(false);
+      }
+    });
+
+
   }
 
   return (
@@ -77,7 +100,7 @@ function Carditem({ data, index, columnIndex }) {
             }}
           >
             <div className='flex justify-between'>
-              <p className='text-base font-semibold truncate'style={{ maxWidth: '150px' }}>{data.title}</p>
+              <p className='text-base font-semibold truncate' style={{ maxWidth: '150px' }}>{data.title}</p>
               <FiEdit onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer' />
             </div>
             <div>
@@ -88,13 +111,13 @@ function Carditem({ data, index, columnIndex }) {
                 const imgIndex = parseInt(assignee.id) % 9;
                 const userImg = personImg[imgIndex];
                 return (
-                  <img src={userImg} alt="Person" className="w-8 h-8 my-1 overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index}/>
+                  <img src={userImg} alt="Person" className="w-8 h-8 my-1 overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index} />
                 )
 
               })}
             </div>
 
-            
+
           </div>
         )}
       </Draggable>
@@ -172,24 +195,29 @@ function Carditem({ data, index, columnIndex }) {
                     const imgIndex = parseInt(assignee.id) % 9;
                     const userImg = personImg[imgIndex];
                     return (
-                      <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index}/>
+                      <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index} />
                     )
                   })
                 }
               </div>
             </div>
             <div className='flex flex-row items-end w-1/3 ml-4'>
+
+              <button className="flex justify-center items-center w-full h-7 mb-2 bg-[#fa3c3c] rounded font-bold text-xs sm:text-sm text-white mr-2"
+                onClick={cardHandleDelete}>
+                刪除
+              </button>
+              <button className="flex justify-center items-center w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white mr-2"
+                onClick={cardHandleSubmit}
+              >
+                儲存
+              </button>
               <button className="flex justify-center items-center w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
                 onClick={() => {
                   setOpen(false);
                   cardDataReset();
                 }}>
                 取消
-              </button>
-              <button className="flex justify-center items-center w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
-                onClick={cardHandleSubmit}
-              >
-                儲存
               </button>
             </div>
           </div>

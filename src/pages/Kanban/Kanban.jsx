@@ -335,7 +335,7 @@ export default function Kanban() {
                                                 key={item.id}
                                                 index={index}
                                                 data={item}
-                                                columnIndex={columnIndex}
+                                                columnIndex={column.id}
                                               />
                                               //   </div>
                                               // )}
