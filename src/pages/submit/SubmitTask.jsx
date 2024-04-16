@@ -9,6 +9,10 @@ import Loader from '../../components/Loader';
 import { socket } from '../../utils/Socket';
 import Swal from 'sweetalert2';
 import { getProject } from '../../api/project';
+import CongratulationsMain_icon from "../../assets/AnimationCongratulationsMain.json";
+import Congratulations_icon from "../../assets/AnimationCongratulations.json";
+import Lottie from "lottie-react";
+// import styles from "./bubble.module.css";
 
 export default function SubmitTask() {
     const [taskData, setTaskData] = useState({});
@@ -27,7 +31,7 @@ export default function SubmitTask() {
             sucesssNotify(res.message)
             localStorage.removeItem("currentStage");
             localStorage.removeItem("currentSubStage");
-            // navigate(`/project/${projectId}/kanban`)
+            navigate(`/project/${projectId}/kanban`)
         },
         onError: (error) => {
             console.log(error);
@@ -107,7 +111,7 @@ export default function SubmitTask() {
 
     }, [socket])
 
- 
+
     // const projectQuery = useQuery(['getProject', projectId], () => fetch(`http://localhost:3000/projects/${projectId}`)
     //     .then(res => res.json())
     //     .catch(err => console.error(err)), {
@@ -123,11 +127,28 @@ export default function SubmitTask() {
             setIsProjectEnded(data.ProjectEnd); // 假设返回的数据中包含 projectEnd 字段
         }
     });
-    
+    const BubbleText = () => {
+        return (
+          <h2 className="text-center text-5xl font-thin text-indigo-300">
+            {"恭喜 ! 已經完成所有階段囉 ~".split("").map((child, idx) => (
+              <span className={styles.hoverText} key={idx}>
+                {child}
+              </span>
+            ))}
+          </h2>
+        );
+      };
+
     return (
         isProjectEnded ?
-            <div className='flex my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center'>
-                <div className=' text-customgreen text-xl font-bold'>階段皆已完成</div>
+            <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center'>
+                <div className=' text-customgreen text-2xl font-bold'>恭喜 ! 已經完成所有階段囉 ~</div>
+                <div className='flex mt-10 gap-20'>
+                    <Lottie className="w-60" animationData={Congratulations_icon} />
+                    <Lottie className="w-96" animationData={CongratulationsMain_icon} />
+                    <Lottie className="w-60" animationData={Congratulations_icon} />
+                </div>
+
             </div>
             :
             <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center'>
