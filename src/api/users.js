@@ -23,3 +23,14 @@ export const  getProjectUser = async (projectId) => {
     const response = await usersApi.get(`/project/${projectId}`)
     return response.data
 }
+
+// get all teachers
+export const getAllTeachers = async () => {
+    try {
+        const response = await usersApi.get('/teachers');
+        return response.data; // 返回的數據會包含所有角色為 'teacher' 的用戶
+    } catch (error) {
+        console.error('Failed to fetch teachers:', error);
+        throw error; // 可以根據需要進一步處理錯誤或傳播
+    }
+}

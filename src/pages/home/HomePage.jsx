@@ -9,6 +9,7 @@ import { BsBoxArrowInRight } from "react-icons/bs";
 import Loader from '../../components/Loader';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { createProject, getAllProject, inviteForProject } from '../../api/project';
+import { getAllTeachers } from '../../api/users';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { GrFormAdd } from "react-icons/gr";
@@ -27,7 +28,7 @@ export default function HomePage() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
   const [doneProjects, setDoneProjects] = useState([]);
-
+  const [teachers, setTeachers] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);  // 用於記錄當前打開的Accordion索引
 
 
@@ -52,6 +53,16 @@ export default function HomePage() {
   //     errorReferralCodeNotify(error.response.data.message)
   //   }
   // })
+
+  useEffect(() => {
+    getAllTeachers().then(data => {
+      console.log(data)
+      setTeachers(data.user); // 根據你的API響應調整
+    }).catch(error => {
+      console.log('Error fetching teachers:', error);
+    });
+  }, []);
+
   const { mutate } = useMutation(createProject, {
     onSuccess: (res) => {
       console.log(res);
@@ -288,7 +299,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <Tooltip children={"活動進度"} content={`已完成${calculateProgressPercentage(projectItem.currentStage, projectItem.currentSubStage)}%`}>
-                  <div className='w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700'>
+                    <div className='w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700'>
                       <div className='bg-[#5BA491] h-2.5 rounded-full transition-all duration-300 ease-in-out' style={{ width: `${calculateProgress(projectItem.currentStage, projectItem.currentSubStage)}%` }}></div>
                     </div>
                   </Tooltip>
@@ -359,8 +370,11 @@ export default function HomePage() {
           />
           <div className="mt-4">
             <label className="block text-gray-700 text-base">指導老師</label>
-            <select name="projectMentor" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
-              <option value="吳老師">吳老師</option>
+            <select name="projectMentor" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-customgreen focus:bg-white focus:outline-none">
+              {/* <option value="吳老師">吳老師</option> */}
+              {teachers.map(teacher => (
+                <option key={teacher.id} value={teacher.username}>{teacher.username}</option> // 假設教師物件有 'id' 和 'name' 屬性
+              ))}
             </select>
           </div>
         </div>
