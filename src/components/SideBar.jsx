@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import { IoBulbOutline } from 'react-icons/io5';
@@ -12,6 +12,8 @@ import { GrCompliance } from "react-icons/gr";
 import { BiTask } from "react-icons/bi";
 import { BsChatDots } from "react-icons/bs";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
+import { socket } from '../utils/Socket';
+import { Context } from '../context/context'
 
 import ChatRoom from './ChatRoom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
@@ -20,6 +22,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 const AnimatedHamburgerButton = () => {
     const [active, setActive] = useState(false);
+
     return (
       <MotionConfig
         transition={{
@@ -100,6 +103,7 @@ export default function SideBar() {
     const [open, setOpen] = useState(false);
     const [chatRoomOpen, setChatRoomOpen] = useState(false);
     const { projectId } = useParams();
+    const { currentStageIndex, setCurrentStageIndex, currentSubStageIndex, setCurrentSubStageIndex } = useContext(Context)
     const menus = [
         { name: "進度看板", link: `/project/${projectId}/kanban`, icon: MdOutlineViewKanban },
         { name: "想法延伸", link: `/project/${projectId}/ideaWall`, icon: FaRegLightbulb },
@@ -120,13 +124,25 @@ export default function SideBar() {
         { name: "歷程", index: 5 }
     ];
     const [selected, setSelected] = useState(0);
-
+        // Handle socket event
+        useEffect(() => {
+            const handleRefreshKanban = (newStages) => {
+                location.reload()
+            };
+            socket.connect();
+            socket.on('refreshKanban', handleRefreshKanban);
+    
+            return () => {
+                // socket.disconnect();
+                socket.off('refreshKanban', handleRefreshKanban);
+            };
+        }, []);
 
     // const getStageColor = (stageIndex) => parseInt(currentStage) === stageIndex ? '#5BA491' : '#BEBEBE';
     const getStageColor = (stageIndex) => {
-        if (parseInt(currentStage) === stageIndex) {
+        if (parseInt(currentStageIndex) === stageIndex) {
             return '#5BA491'; // 当前阶段
-        } else if (stageIndex < parseInt(currentStage)) {
+        } else if (stageIndex < parseInt(currentStageIndex)) {
             return '#7C968F'; // 小于当前阶段的阶段
         } else {
             return '#BEBEBE'; // 其他阶段

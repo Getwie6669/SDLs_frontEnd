@@ -112,20 +112,11 @@ export default function SubmitTask() {
 
     }, [socket])
 
-
-    // const projectQuery = useQuery(['getProject', projectId], () => fetch(`http://localhost:3000/projects/${projectId}`)
-    //     .then(res => res.json())
-    //     .catch(err => console.error(err)), {
-    //         onSuccess: (data) => {
-    //             console.log(data)
-    //             setIsProjectEnded(data.ProjectEnd); // 假设返回的数据中包含 projectEnd 字段
-    //         }
-    //     }
-    // );
     const projectQuery = useQuery(['getProject', projectId], () => getProject(projectId), {
         onSuccess: (data) => {
             console.log(data);
             setIsProjectEnded(data.ProjectEnd); // 假设返回的数据中包含 projectEnd 字段
+        
         }
     });
     const BubbleText = () => {

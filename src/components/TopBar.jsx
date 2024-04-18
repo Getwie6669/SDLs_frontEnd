@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { BsChevronDown, BsPlusCircleDotted } from "react-icons/bs";
 import { getProjectUser } from '../api/users';
@@ -9,6 +9,7 @@ import { GrFormClose } from "react-icons/gr";
 import Modal from './Modal';
 import Swal from 'sweetalert2';
 import { socket } from '../utils/Socket';
+import { Context } from '../context/context'
 
 export default function TopBar() {
   const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
@@ -22,6 +23,10 @@ export default function TopBar() {
     '/public/person/man4.png', '/public/person/man5.png', '/public/person/man6.png',
     '/public/person/woman1.png', '/public/person/woman2.png', '/public/person/woman3.png'
   ];
+  const [reloadPage, setReloadPage] = useState(false); // 新增狀態
+
+  const { currentStageIndex, setCurrentStageIndex,currentSubStageIndex, setCurrentSubStageIndex} = useContext(Context)
+
   const getProjectUserQuery = useQuery("getProjectUser", () => getProjectUser(projectId),
     {
       onSuccess: setProjectUsers,
@@ -35,10 +40,15 @@ export default function TopBar() {
         setProjectInfo(data);
         localStorage.setItem('currentStage', data.currentStage)
         localStorage.setItem('currentSubStage', data.currentSubStage)
+        setCurrentStageIndex(data.currentStage)
+        setCurrentSubStageIndex(data.currentSubStage)
+        console.log("FKFKFOKOK")
       },
       enabled: !!projectId
     }
   );
+
+
 
   const cleanStage = () => {
     localStorage.removeItem('currentStage')

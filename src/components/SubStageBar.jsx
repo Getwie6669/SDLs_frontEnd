@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { socket } from '../utils/Socket';
 // import { useQuery } from 'react-query';
+import { Context } from '../context/context'
 
 const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
     const [animationClass, setAnimationClass] = useState('');
@@ -147,8 +148,8 @@ const stageInfo = [
 
 export default function SubStageComponent() {
     // State hooks for stage indices
-    const [currentStageIndex, setCurrentStageIndex] = useState(parseInt(localStorage.getItem("currentStage"), 10) || 1);
-    const [currentSubStageIndex, setCurrentSubStageIndex] = useState(parseInt(localStorage.getItem("currentSubStage"), 10) || 1);
+
+    const { currentStageIndex, setCurrentStageIndex, currentSubStageIndex, setCurrentSubStageIndex } = useContext(Context)
     const [stages, setStages] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [imageSrc, setImageSrc] = useState('/robot.png');
@@ -160,7 +161,10 @@ export default function SubStageComponent() {
     useEffect(() => {
         const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
         setStages(isValidStageIndex ? stageInfo[currentStageIndex - 1] : []);
-    }, [currentStageIndex, stageInfo]);
+        console.log("OKOKOKOK",currentStageIndex)
+        console.log("OKOKOKOK",currentSubStageIndex)
+
+    }, [currentStageIndex,currentSubStageIndex, stageInfo]);
 
     const handleRobotClick = () => {
         document.body.style.overflow = 'hidden'; // 開啟DialogBox時禁止滾動
@@ -190,20 +194,13 @@ export default function SubStageComponent() {
     // Handle socket event
     useEffect(() => {
         const handleRefreshKanban = (newStages) => {
-            setCurrentStageIndex(prev => {
-                console.log("New currentStageIndex", parseInt(localStorage.getItem("currentStage"), 10) || 1);
-                return parseInt(localStorage.getItem("currentStage"), 10) || 1;
-            });
-            setCurrentSubStageIndex(prev => {
-                console.log("New currentSubStageIndex", parseInt(localStorage.getItem("currentSubStage"), 10) || 1);
-                return parseInt(localStorage.getItem("currentSubStage"), 10) || 1;
-            });
-            // Optionally, handle newStages if necessary
+            location.reload()
         };
-
+        socket.connect();
         socket.on('refreshKanban', handleRefreshKanban);
 
         return () => {
+            // socket.disconnect();
             socket.off('refreshKanban', handleRefreshKanban);
         };
     }, []);
