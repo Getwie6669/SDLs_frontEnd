@@ -19,7 +19,7 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa';  // 引入Font Awes
 
 export default function HomePage() {
   const [projectData, setProjectData] = useState([]);
-  const [createprojectData, setCreateProjectData] = useState({ projectMentor: "吳老師" });
+  const [createprojectData, setCreateProjectData] = useState({ projectMentor: "" });
   const [inviteprojectData, setInviteProjectData] = useState({});
   const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false);
   const [inviteProjectModalOpen, setInviteProjectModalOpen] = useState(false)
@@ -135,6 +135,7 @@ export default function HomePage() {
   });
   const handleChange = e => {
     const { name, value } = e.target;
+    console.log(name, value)
     setCreateProjectData(prev => ({
       ...prev,
       [name]: value,
@@ -143,6 +144,10 @@ export default function HomePage() {
   }
 
   const handleCreateProject = () => {
+    if (createprojectData.projectMentor === "") {
+      toast.error("請選擇指導老師");
+      return;
+    }
     mutate(createprojectData);
   }
 
@@ -270,7 +275,6 @@ export default function HomePage() {
               ))}
             </div>
           </Accordion>
-
           <Accordion
             index={1}
             title="已結束活動"
@@ -280,14 +284,14 @@ export default function HomePage() {
             {/* <h2 className="text-lg font-bold mb-4 mt-10">已完成</h2> */}
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
               {completedProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
-                <div key={index} className='bg-gray-300 w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
+                <div key={index} className='bg-white w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
                   <div className='flex items-center'>
                     <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2 text-[#5BA491]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className='text-gray-500'>{projectItem.describe}</p>
+                  <p className='text-gray-600 font-semibold'>{projectItem.describe}</p>
                   <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
                   <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
                   <div className='flex justify-between text-sm text-gray-500'>
@@ -317,13 +321,19 @@ export default function HomePage() {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
               {doneProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
                 <div key={index} className='bg-gray-300 w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
-                  <div className='flex items-center'>
-                    <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2 text-[#5BA491]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center'>
+                      <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2 text-[#5BA491]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <button className='ml-2 bg-[#5BA491] text-white px-3 font-bold py-1 rounded hover:bg-[#5BA491]/80 transition duration-150 ease-in-out'>
+                      匯出
+                    </button>
                   </div>
-                  <p className='text-gray-500'>{projectItem.describe}</p>
+
+                  <p className='text-gray-600 font-semibold'>{projectItem.describe}</p>
                   <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
                   <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
                   <div className='flex justify-between text-sm text-gray-500'>
@@ -339,7 +349,7 @@ export default function HomePage() {
                       <div className='bg-[#5BA491] h-2.5 rounded-full transition-all duration-300 ease-in-out' style={{ width: '100%' }}></div>
                     </div>
                   </Tooltip>
-                  <button className='mt-2 bg-[#5BA491] text-white rounded-lg px-4 py-2 hover:bg-[#5BA491]/80 transition duration-200 ease-in-out font-semibold' onClick={() => navigate(`/project/${projectItem.id}/kanban`)}>製作學習歷程</button>
+                  <button className='mt-2 bg-[#5BA491] text-white rounded-lg px-4 py-2 hover:bg-[#5BA491]/80 transition duration-200 ease-in-out font-semibold' onClick={() => navigate(`/project/${projectItem.id}/kanban`)}>查看學習歷程</button>
                 </div>
               ))}
             </div>
@@ -370,8 +380,8 @@ export default function HomePage() {
           />
           <div className="mt-4">
             <label className="block text-gray-700 text-base">指導老師</label>
-            <select name="projectMentor" onChange={handleChange} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-customgreen focus:bg-white focus:outline-none">
-              {/* <option value="吳老師">吳老師</option> */}
+            <select name="projectMentor" onChange={handleChange} value={createprojectData.projectMentor} className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-customgreen focus:bg-white focus:outline-none" required>
+              <option value="" disabled>- 請選擇指導老師 -</option>
               {teachers.map(teacher => (
                 <option key={teacher.id} value={teacher.username}>{teacher.username}</option> // 假設教師物件有 'id' 和 'name' 屬性
               ))}

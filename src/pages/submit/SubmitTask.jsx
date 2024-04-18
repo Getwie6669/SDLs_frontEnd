@@ -31,6 +31,7 @@ export default function SubmitTask() {
             sucesssNotify(res.message)
             localStorage.removeItem("currentStage");
             localStorage.removeItem("currentSubStage");
+            socket.emit('taskSubmitted', { projectId: projectId, message: 'Task updated' });
             navigate(`/project/${projectId}/kanban`)
         },
         onError: (error) => {

@@ -43,7 +43,19 @@ export default function Kanban() {
       onSuccess: setKanbanData
     }
   );
+  // 在Kanban组件中
+  useEffect(() => {
+    socket.on('refreshKanban', (data) => {
+      console.log('Refreshing Kanban board for project:', data.projectId);
+      // 使用react-query的invalidateQueries方法刷新数据
+      queryClient.invalidateQueries(['kanbanDatas', data.projectId]);
+    });
 
+    return () => {
+      socket.off('refreshKanban');
+    };
+  }, [socket, queryClient]);
+  
   const getSubStageQuery = useQuery("getSubStage", () => getSubStage({
     projectId: projectId,
     currentStage: localStorage.getItem("currentStage"),
@@ -204,7 +216,7 @@ export default function Kanban() {
       }
     });
   }
-  
+
   return (
     <div style={{ display: 'inline-flex' }} className="layout__wrapper min-w-full h-full bg-white" >
       <div className="card p-8 w-full px-20">
@@ -275,7 +287,7 @@ export default function Kanban() {
                               <div
                                 {...provided.dragHandleProps}
                                 className="store-container p-3 rounded-lg cursor-move flex justify-between items-center"
-                                >
+                              >
                                 <h3 style={{ color: "#5BA491" }} className="text-lg font-semibold">
                                   {column.name}
                                 </h3>

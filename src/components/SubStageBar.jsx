@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef  } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { socket } from '../utils/Socket';
+// import { useQuery } from 'react-query';
 
 const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
     const [animationClass, setAnimationClass] = useState('');
@@ -109,7 +111,7 @@ const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
     };
 
 
-    
+
     if (!isOpen && animationClass.includes('opacity-0')) return null;
 
 
@@ -138,37 +140,27 @@ const stageInfo = [
     ["檢視研究進度", "進行研究討論", "撰寫研究結論"],
     ["封面製作", "摘要撰寫", "目錄編制", "內容撰寫", "反思撰寫"]
 ];
-const currentStageIndex = parseInt(localStorage.getItem("currentStage"), 10) || 1;
-const currentSubStageIndex = parseInt(localStorage.getItem("currentSubStage"), 10) || 1;
+// const currentStageIndex = parseInt(localStorage.getItem("currentStage"), 10) || 1;
+// const currentSubStageIndex = parseInt(localStorage.getItem("currentSubStage"), 10) || 1;
 
-const getStageColor = (stageIndex) => {
-    if (currentSubStageIndex === stageIndex) {
-        return '#5BA491'; // 当前阶段
-    } else if (stageIndex < currentSubStageIndex) {
-        return '#7C968F'; // 小于当前阶段的阶段
-    } else {
-        return '#BEBEBE'; // 其他阶段
-    }
-};
-const getTextColor = (stageIndex) => {
-    if (currentSubStageIndex === stageIndex) {
-        return 'text-white animate-pulse '; // 当前阶段
-    } else if (stageIndex < currentSubStageIndex) {
-        return 'text-slate-200'; // 小于当前阶段的阶段
-    } else {
-        return 'text-slate-700'; // 其他阶段
-    }
-};
 
 
 export default function SubStageComponent() {
-    const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
-    const stages = isValidStageIndex ? stageInfo[currentStageIndex - 1] : [];
+    // State hooks for stage indices
+    const [currentStageIndex, setCurrentStageIndex] = useState(parseInt(localStorage.getItem("currentStage"), 10) || 1);
+    const [currentSubStageIndex, setCurrentSubStageIndex] = useState(parseInt(localStorage.getItem("currentSubStage"), 10) || 1);
+    const [stages, setStages] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [imageSrc, setImageSrc] = useState('/robot.png');
     const [isHovered, setIsHovered] = useState(false);
     const [ignoreHover, setIgnoreHover] = useState(false); // 新增狀態
-    const dialogRef = useRef(); // 使用 useRef 創建一個 ref 來引用 DialogBox
+    const dialogRef = useRef();
+
+    // Update stages based on the current stage index
+    useEffect(() => {
+        const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
+        setStages(isValidStageIndex ? stageInfo[currentStageIndex - 1] : []);
+    }, [currentStageIndex, stageInfo]);
 
     const handleRobotClick = () => {
         document.body.style.overflow = 'hidden'; // 開啟DialogBox時禁止滾動
@@ -176,6 +168,51 @@ export default function SubStageComponent() {
         setImageSrc('/robot2.png');
         setIgnoreHover(true);
     };
+    const getStageColor = (stageIndex) => {
+        if (currentSubStageIndex === stageIndex) {
+            return '#5BA491'; // 当前阶段
+        } else if (stageIndex < currentSubStageIndex) {
+            return '#7C968F'; // 小于当前阶段的阶段
+        } else {
+            return '#BEBEBE'; // 其他阶段
+        }
+    };
+    const getTextColor = (stageIndex) => {
+        if (currentSubStageIndex === stageIndex) {
+            return 'text-white animate-pulse '; // 当前阶段
+        } else if (stageIndex < currentSubStageIndex) {
+            return 'text-slate-200'; // 小于当前阶段的阶段
+        } else {
+            return 'text-slate-700'; // 其他阶段
+        }
+    };
+
+    // Handle socket event
+    useEffect(() => {
+        const handleRefreshKanban = (newStages) => {
+            setCurrentStageIndex(prev => {
+                console.log("New currentStageIndex", parseInt(localStorage.getItem("currentStage"), 10) || 1);
+                return parseInt(localStorage.getItem("currentStage"), 10) || 1;
+            });
+            setCurrentSubStageIndex(prev => {
+                console.log("New currentSubStageIndex", parseInt(localStorage.getItem("currentSubStage"), 10) || 1);
+                return parseInt(localStorage.getItem("currentSubStage"), 10) || 1;
+            });
+            // Optionally, handle newStages if necessary
+        };
+
+        socket.on('refreshKanban', handleRefreshKanban);
+
+        return () => {
+            socket.off('refreshKanban', handleRefreshKanban);
+        };
+    }, []);
+
+    useEffect(() => {
+        console.log("Updated currentStageIndex", currentStageIndex);
+        console.log("Updated currentSubStageIndex", currentSubStageIndex);
+        // 這裡可以根據更新後的狀態執行一些操作
+    }, [currentStageIndex, currentSubStageIndex]);
 
     const handleCloseDialog = () => {
         document.body.style.overflow = ''; // 關閉DialogBox時恢復滾動
@@ -205,7 +242,7 @@ export default function SubStageComponent() {
     const handleMouseLeave = () => {
         if (!ignoreHover) {
             setImageSrc('/robot.png')
-            
+
         }
         setIsHovered(false)
     }
