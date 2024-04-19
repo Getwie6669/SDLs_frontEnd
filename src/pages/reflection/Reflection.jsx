@@ -48,6 +48,19 @@ export default function Reflection() {
         }
     );
 
+    const [showEmptyMessage, setShowEmptyMessage] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (personalDaily.length === 0 && teamDaily.length === 0 && !isLoading && !isError) {
+                setShowEmptyMessage(true);
+            }
+
+        },20); // 延迟500毫秒显示空状态消息
+
+        return () => clearTimeout(timer);
+    }, [personalDaily.length, teamDaily.length, isLoading, isError]);
+
     const teamDailyQuery = useQuery({
         queryKey: ['teamDaily'],
         queryFn: () => getAllTeamDaily({ params: { projectId: projectId } }),
@@ -175,11 +188,12 @@ export default function Reflection() {
                             isLoading ? <Loader /> :
                                 isError ? <p className='text-base font-bold'>{error.message}</p> :
                                     personalDaily.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center mx-80">
-                                            <Lottie className="w-64" animationData={personalDailyIcon} />
-                                            <p className=' font-bold text-zinc-600 text-lg'>還沒新增過個人日誌 ! 趕快新增你的第一個個人日誌吧 ~</p>
-                                        </div>
-                                    ) : (
+                                        showEmptyMessage && (
+                                            <div className="flex flex-col items-center justify-center mx-80">
+                                                <Lottie className="w-64" animationData={personalDailyIcon} />
+                                                <p className=' font-bold text-zinc-600 text-lg'>還沒新增過個人日誌 ! 趕快新增你的第一個個人日誌吧 ~</p>
+                                            </div>
+                                        )) : (
                                         personalDaily.map((item, index) => (
 
                                             <div className='flex-none mb-3 flex-col items-center bg-white rounded-lg shadow-lg mr-5' key={index}>
@@ -216,11 +230,12 @@ export default function Reflection() {
                                 teamDailyQuery.isError ? <p className=' text-base font-bold'>{error.message}</p> :
 
                                     teamDaily.length === 0 ? (
+                                        showEmptyMessage && (
                                         <div className="flex flex-col items-center justify-center mx-80">
                                             <Lottie className=" w-72" animationData={personalDailyIcon} />
                                             <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
                                         </div>
-                                    ) : (
+                                    )) : (
                                         teamDaily.map((item, index) => {
                                             if (item.type === "discuss") {
                                                 return (
@@ -260,24 +275,24 @@ export default function Reflection() {
                     </div>
                     {isTooltipVisible && (
                         <motion.div
-                        className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={fadeInOut}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                        <button onClick={closeTooltip} className='absolute top-1 right-1'>
-                            <GrFormClose className='w-4 h-4' />
-                        </button>
-                        <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
-                        <ul>
-                            <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
-                            <li className='  text-sm '>2.完成的心得反思。</li>
-                            <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
-                            <li className='  text-sm '>4.是否遇到新的問題。</li>
-                        </ul>
-                    </motion.div>
+                            className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={fadeInOut}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                            <button onClick={closeTooltip} className='absolute top-1 right-1'>
+                                <GrFormClose className='w-4 h-4' />
+                            </button>
+                            <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
+                            <ul>
+                                <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
+                                <li className='  text-sm '>2.完成的心得反思。</li>
+                                <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
+                                <li className='  text-sm '>4.是否遇到新的問題。</li>
+                            </ul>
+                        </motion.div>
                     )}
                     <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
                         type="text"
@@ -317,76 +332,76 @@ export default function Reflection() {
             </Modal>
             {/* 小組反思日誌 */}
             <Modal open={teamDailyModalOpen} onClose={() => setTeamDailyModalOpen(false)} opacity={true} position={"justify-center items-center"}>
-    <button onClick={() => setTeamDailyModalOpen(false)} className='absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-        <GrFormClose className='w-6 h-6' />
-    </button>
-    <div className='flex flex-col px-1'>
-        <h3 className='font-bold text-lg mb-3 text-center'>小組反思日誌</h3>
-        <div className='flex items-center mb-3'>
-            <p className='font-bold text-base'>日誌內容</p>
-            <button
-                onClick={toggleTooltip}
-                className='ml-2 p-1 hover:bg-customgreen-dark'>
-                <GrCircleQuestion className='w-4 h-4 text-white' />
-            </button>
-        </div>
-        {isTooltipVisible && (
-            <motion.div
-            className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={fadeInOut}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-        >
-            <button onClick={closeTooltip} className='absolute top-1 right-1'>
-                <GrFormClose className='w-4 h-4' />
-            </button>
-            <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
-            <ul>
-                <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
-                <li className='  text-sm '>2.完成的心得反思。</li>
-                <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
-                <li className='  text-sm '>4.是否遇到新的問題。</li>
-            </ul>
-        </motion.div>
-        )}
-        <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
-            type="text"
-            placeholder="日誌名稱..."
-            name='title'
-            onChange={handleChange}
-            required
-        />
-        <textarea className="rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
-            rows={10}
-            placeholder="撰寫您的日誌..."
-            name='content'
-            onChange={handleChange}
-        />
-        <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
-            type="file"
-            name='filename'
-            onChange={handleAddFileChange}
-            multiple
-        />
-        <div className='flex justify-end m-2'>
-            <button
-                onClick={() => setTeamDailyModalOpen(false)}
-                className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2">
-                取消
-            </button>
-            <button onClick={e => {
-                handleCreateTeamDaily(e);
-                setTeamDailyModalOpen(false);
-            }}
-                type="submit"
-                className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
-                儲存
-            </button>
-        </div>
-    </div>
-</Modal>
+                <button onClick={() => setTeamDailyModalOpen(false)} className='absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+                    <GrFormClose className='w-6 h-6' />
+                </button>
+                <div className='flex flex-col px-1'>
+                    <h3 className='font-bold text-lg mb-3 text-center'>小組反思日誌</h3>
+                    <div className='flex items-center mb-3'>
+                        <p className='font-bold text-base'>日誌內容</p>
+                        <button
+                            onClick={toggleTooltip}
+                            className='ml-2 p-1 hover:bg-customgreen-dark'>
+                            <GrCircleQuestion className='w-4 h-4 text-white' />
+                        </button>
+                    </div>
+                    {isTooltipVisible && (
+                        <motion.div
+                            className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={fadeInOut}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                            <button onClick={closeTooltip} className='absolute top-1 right-1'>
+                                <GrFormClose className='w-4 h-4' />
+                            </button>
+                            <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
+                            <ul>
+                                <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
+                                <li className='  text-sm '>2.完成的心得反思。</li>
+                                <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
+                                <li className='  text-sm '>4.是否遇到新的問題。</li>
+                            </ul>
+                        </motion.div>
+                    )}
+                    <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+                        type="text"
+                        placeholder="日誌名稱..."
+                        name='title'
+                        onChange={handleChange}
+                        required
+                    />
+                    <textarea className="rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
+                        rows={10}
+                        placeholder="撰寫您的日誌..."
+                        name='content'
+                        onChange={handleChange}
+                    />
+                    <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+                        type="file"
+                        name='filename'
+                        onChange={handleAddFileChange}
+                        multiple
+                    />
+                    <div className='flex justify-end m-2'>
+                        <button
+                            onClick={() => setTeamDailyModalOpen(false)}
+                            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2">
+                            取消
+                        </button>
+                        <button onClick={e => {
+                            handleCreateTeamDaily(e);
+                            setTeamDailyModalOpen(false);
+                        }}
+                            type="submit"
+                            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
+                            儲存
+                        </button>
+                    </div>
+                </div>
+            </Modal>
             {/* 檢視 */}
             {
                 selectedDaily &&

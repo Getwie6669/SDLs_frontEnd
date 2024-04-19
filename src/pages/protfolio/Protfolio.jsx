@@ -21,14 +21,32 @@ export default function Protfolio() {
     const [modalData, setModalData] = useState({});
     const { projectId } = useParams();
     const [activeItemId, setActiveItemId] = useState(null); // 新增状态以追踪当前被点击的项目 ID
-
+    const [showEmptyMessage, setShowEmptyMessage] = useState(false);
+    let portfolioItemsWithTitles = [];
     const {
         isLoading,
         isError,
-    } = useQuery("protfolioDatas", () => getAllSubmit(
-        { params: { projectId: projectId } }),
-        { onSuccess: setStagePortfolio }
-    );
+        data: portfolioData
+      } = useQuery("protfolioDatas", () => getAllSubmit(
+          { params: { projectId: projectId } }),
+          {
+            onSuccess: (data) => {
+              setStagePortfolio(data);
+              setShowEmptyMessage(data.length === 0);
+            }
+          }
+      );
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        if (portfolioItemsWithTitles.length === 0 && !isLoading && !isError) {
+          setShowEmptyMessage(true);
+        }
+      }, 20); // 延迟500毫秒显示空状态消息
+    
+      return () => clearTimeout(timer);
+    }, [portfolioItemsWithTitles.length, isLoading, isError]);
+    
+    
     const stageDescriptions = {
         "1-1": "提出研究主題",
         "1-2": "提出研究目的",
@@ -44,7 +62,6 @@ export default function Protfolio() {
         "4-3": "撰寫研究結論"
     };
     const insertTitles = ["定標", "擇策", "監評", "調節"];
-    let portfolioItemsWithTitles = [];
     // 加入首行文字
     stagePortfolio.forEach((item, index) => {
         if (index % 3 === 0) {
@@ -89,11 +106,14 @@ export default function Protfolio() {
                                 isError ? <p className=' font-bold text-2xl'>{isError.message}</p> :
                                     // stagePortfolio.map(item => {
                                     portfolioItemsWithTitles.length === 0 ? (
-                                        // 當數據為空時顯示的部分
-                                        <div className="flex flex-col items-center justify-center w-full h-full my-5">
-                                            <Lottie className=" w-96" animationData={ProtfoliioIcon} />
-                                            <p className="text-lg text-zinc-600 font-bold mt-2">目前還未新增歷程檔案，快和小組成員互相討論並記錄討論結果吧 !</p>
-                                        </div>
+                                        
+                                            showEmptyMessage && (
+                                              <div className="flex flex-col items-center justify-center w-full h-full my-5">
+                                                <Lottie className="w-96" animationData={ProtfoliioIcon} />
+                                                <p className="text-lg text-zinc-600 font-bold mt-2">目前還未新增歷程檔案，快和小組成員互相討論並記錄討論結果吧 !</p>
+                                              </div>
+                                            )
+                                          
                                     ) : (
 
                                         portfolioItemsWithTitles.map((item, index) => {
