@@ -13,6 +13,8 @@ import Lottie from "lottie-react";
 import { socket } from '../../utils/Socket';
 import FileDownload from 'js-file-download';
 import { AiOutlineCloudDownload } from "react-icons/ai";
+import { GrCircleQuestion } from 'react-icons/gr';
+import { motion } from 'framer-motion';
 
 export default function Reflection() {
     const { projectId } = useParams();
@@ -25,6 +27,15 @@ export default function Reflection() {
     const [personalDailyModalOpen, setPersonalDailyModalOpen] = useState(false);
     const [teamDailyModalOpen, setTeamDailyModalOpen] = useState(false);
     const queryClient = useQueryClient();
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+
+    const toggleTooltip = () => {
+        setIsTooltipVisible(!isTooltipVisible);
+    };
+    const closeTooltip = () => {
+        setIsTooltipVisible(false);
+    };
+
     const {
         isLoading,
         isError,
@@ -130,7 +141,10 @@ export default function Reflection() {
     const errorNotify = (toastContent) => toast.error(toastContent);
     const sucesssNotify = (toastContent) => toast.success(toastContent);
 
-
+    const fadeInOut = {
+        hidden: { opacity: 0, scale: 0.95, y: 20 },
+        visible: { opacity: 1, scale: 1, y: 0 },
+    }
 
     // socket
     useEffect(() => {
@@ -231,114 +245,148 @@ export default function Reflection() {
 
             {/* 個人反思日誌 */}
             <Modal open={personalDailyModalOpen} onClose={() => setPersonalDailyModalOpen(false)} opacity={true} position={"justify-center items-center"}>
-                <button onClick={() => setPersonalDailyModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-                    <GrFormClose className=' w-6 h-6' />
+                <button onClick={() => setPersonalDailyModalOpen(false)} className='absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+                    <GrFormClose className='w-6 h-6' />
                 </button>
                 <div className='flex flex-col px-1'>
-                    <h3 className=' font-bold text-lg mb-3 text-center'>個人反思日誌</h3>
-                    <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
-                    <p className=' font-bold text-base '>1.最近完成的進度內容。</p>
-                    <p className=' font-bold text-base '>2.完成的完成的心得反思。</p>
-                    <p className=' font-bold text-base '>3.下次的預計完成的進度內容。</p>
-                    <p className=' font-bold text-base mb-3'> 4.是否遇到新的問題。</p>
-                    <p className=' font-bold text-base mb-3'>日誌標題</p>
-                    <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+                    <h3 className='font-bold text-lg mb-3 text-center'>個人反思日誌</h3>
+                    <div className='flex items-center mb-3'>
+                        <p className='font-bold text-base'>日誌內容</p>
+                        <button
+                            onClick={toggleTooltip}
+                            className='ml-2 p-1 hover:bg-customgreen-dark'>
+                            <GrCircleQuestion className='w-4 h-4 text-white' />
+                        </button>
+                    </div>
+                    {isTooltipVisible && (
+                        <motion.div
+                        className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={fadeInOut}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                        <button onClick={closeTooltip} className='absolute top-1 right-1'>
+                            <GrFormClose className='w-4 h-4' />
+                        </button>
+                        <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
+                        <ul>
+                            <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
+                            <li className='  text-sm '>2.完成的心得反思。</li>
+                            <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
+                            <li className='  text-sm '>4.是否遇到新的問題。</li>
+                        </ul>
+                    </motion.div>
+                    )}
+                    <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
                         type="text"
                         placeholder="日誌名稱..."
                         name='title'
                         onChange={handleChange}
                         required
                     />
-                    <p className=' font-bold text-base mb-3'>日誌內容</p>
-                    <textarea className=" rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
-                        rows={3}
-                        placeholder="日誌內容"
+                    <textarea className="rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
+                        rows={10}
+                        placeholder="撰寫您的日誌..."
                         name='content'
                         onChange={handleChange}
                     />
-                    <p className=' font-bold text-base mb-3'>附加檔案</p>
-                    <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+                    <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
                         type="file"
                         name='filename'
                         onChange={handleAddFileChange}
                         multiple
                     />
-                </div>
-                <div className='flex justify-end m-2'>
-                    <button
-                        onClick={() => setPersonalDailyModalOpen(false)}
-                        className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2" >
-                        取消
-                    </button>
-                    <button onClick={e => {
-                        handleCreatePersonalDaily(e);
-                        setPersonalDailyModalOpen(false);
-                    }}
-                        type="submit"
-                        className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
-                        儲存
-                    </button>
+                    <div className='flex justify-end m-2'>
+                        <button
+                            onClick={() => setPersonalDailyModalOpen(false)}
+                            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2">
+                            取消
+                        </button>
+                        <button onClick={e => {
+                            handleCreatePersonalDaily(e);
+                            setPersonalDailyModalOpen(false);
+                        }}
+                            type="submit"
+                            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
+                            儲存
+                        </button>
+                    </div>
                 </div>
             </Modal>
             {/* 小組反思日誌 */}
             <Modal open={teamDailyModalOpen} onClose={() => setTeamDailyModalOpen(false)} opacity={true} position={"justify-center items-center"}>
-                <button onClick={() => setTeamDailyModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
-                    <GrFormClose className=' w-6 h-6' />
-                </button>
-                <div className='flex flex-col px-1'>
-                    <h3 className=' font-bold text-lg mb-3 text-center'>小組反思日誌</h3>
-                    <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
-                    <p className=' font-bold text-base '>1.最近完成的進度內容。</p>
-                    <p className=' font-bold text-base '>2.完成的完成的心得反思。</p>
-                    <p className=' font-bold text-base '>3.下次的預計完成的進度內容。</p>
-                    <p className=' font-bold text-base mb-3'> 4.是否遇到新的問題。</p>
-                    <p className=' font-bold text-base mb-3'>專案階段</p>
-                    <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
-                        type="text"
-                        placeholder="專案階段 ex:1-1"
-                        name='stage'
-                        onChange={handleTeamDailyChange}
-                        required
-                    />
-                    <p className=' font-bold text-base mb-3'>日誌標題</p>
-                    <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
-                        type="text"
-                        placeholder="日誌名稱..."
-                        name='title'
-                        onChange={handleTeamDailyChange}
-                        required
-                    />
-                    <p className=' font-bold text-base mb-3'>日誌內容</p>
-                    <textarea className=" rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
-                        rows={3}
-                        placeholder="日誌內容"
-                        name='content'
-                        onChange={handleTeamDailyChange}
-                    />
-                    <p className=' font-bold text-base mb-3'>附加檔案</p>
-                    <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
-                        type="file"
-                        name='filename'
-                        onChange={handleAddFileChange}
-                        multiple
-                    />
-                </div>
-                <div className='flex justify-end m-2'>
-                    <button
-                        onClick={() => setTeamDailyModalOpen(false)}
-                        className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2" >
-                        取消
-                    </button>
-                    <button onClick={e => {
-                        handleCreateTeamDaily(e);
-                        setTeamDailyModalOpen(false);
-                    }}
-                        type="submit"
-                        className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
-                        儲存
-                    </button>
-                </div>
-            </Modal>
+    <button onClick={() => setTeamDailyModalOpen(false)} className='absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+        <GrFormClose className='w-6 h-6' />
+    </button>
+    <div className='flex flex-col px-1'>
+        <h3 className='font-bold text-lg mb-3 text-center'>小組反思日誌</h3>
+        <div className='flex items-center mb-3'>
+            <p className='font-bold text-base'>日誌內容</p>
+            <button
+                onClick={toggleTooltip}
+                className='ml-2 p-1 hover:bg-customgreen-dark'>
+                <GrCircleQuestion className='w-4 h-4 text-white' />
+            </button>
+        </div>
+        {isTooltipVisible && (
+            <motion.div
+            className="absolute z-10 bg-white p-6 rounded shadow-lg text-sm"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={fadeInOut}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+            <button onClick={closeTooltip} className='absolute top-1 right-1'>
+                <GrFormClose className='w-4 h-4' />
+            </button>
+            <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
+            <ul>
+                <li className='  text-sm pt-2'>1.最近完成的進度內容。</li>
+                <li className='  text-sm '>2.完成的心得反思。</li>
+                <li className='  text-sm '>3.下次的預計完成的進度內容。</li>
+                <li className='  text-sm '>4.是否遇到新的問題。</li>
+            </ul>
+        </motion.div>
+        )}
+        <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+            type="text"
+            placeholder="日誌名稱..."
+            name='title'
+            onChange={handleChange}
+            required
+        />
+        <textarea className="rounded outline-none ring-2 ring-customgreen w-full mb-3 p-1"
+            rows={10}
+            placeholder="撰寫您的日誌..."
+            name='content'
+            onChange={handleChange}
+        />
+        <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+            type="file"
+            name='filename'
+            onChange={handleAddFileChange}
+            multiple
+        />
+        <div className='flex justify-end m-2'>
+            <button
+                onClick={() => setTeamDailyModalOpen(false)}
+                className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2">
+                取消
+            </button>
+            <button onClick={e => {
+                handleCreateTeamDaily(e);
+                setTeamDailyModalOpen(false);
+            }}
+                type="submit"
+                className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
+                儲存
+            </button>
+        </div>
+    </div>
+</Modal>
             {/* 檢視 */}
             {
                 selectedDaily &&
@@ -355,7 +403,7 @@ export default function Reflection() {
                         />
                         <p className=' font-bold text-base mb-3'>內容</p>
                         <textarea className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
-                            rows={3}
+                            rows={10}
                             placeholder="內容"
                             name='content'
                             value={selectedDaily.content}
@@ -380,7 +428,7 @@ export default function Reflection() {
                         )}
                     </div>
                     <div className='flex justify-end m-2'>
-                       
+
                         <button onClick={() => setInspectDailyModalOpen(false)} className="inline-flex items-center justify-center px-4 py-2 bg-[#5BA491] text-white rounded-md hover:bg-[#487e6c] transition-colors duration-300 ease-in-out" >
                             關閉
                         </button>
