@@ -61,7 +61,7 @@ function Carditem({ data, index, columnIndex }) {
     }));
   }
   const cardHandleSubmit = () => {
-    socket.emit("cardUpdated", { cardData, columnIndex, index });
+    socket.emit("cardUpdated", { cardData, columnIndex, index, projectId });
     setOpen(false);
   }
   const cardHandleDelete = () => {
@@ -77,7 +77,7 @@ function Carditem({ data, index, columnIndex }) {
       cancelButtonText: "取消"
     }).then((result) => {
       if (result.isConfirmed) {
-        socket.emit("cardDelete", { cardData, columnIndex, index });
+        socket.emit("cardDelete", { cardData, columnIndex, index, projectId });
         setOpen(false);
       }
     });

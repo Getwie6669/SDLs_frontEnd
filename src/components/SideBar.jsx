@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext  } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import { IoBulbOutline } from 'react-icons/io5';
@@ -24,80 +24,80 @@ const AnimatedHamburgerButton = () => {
     const [active, setActive] = useState(false);
 
     return (
-      <MotionConfig
-        transition={{
-          duration: 0.5,
-          ease: "easeInOut",
-        }}
-      >
-        <motion.button
-          initial={false}
-          animate={active ? "open" : "closed"}
-          onClick={() => setActive((pv) => !pv)}
-          className="relative h-8 w-8 transition-colors hover:bg-white/20"
-        >
-          <motion.span
-            variants={VARIANTS.top}
-            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
-            style={{ y: "-50%", left: "50%", x: "-50%", top: "25%" }}
-          />
-          <motion.span
-            variants={VARIANTS.middle}
-            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
-            style={{ left: "50%", x: "-50%", top: "50%", y: "-50%" }}
-          />
-          <motion.span
-            variants={VARIANTS.bottom}
-            className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
-            style={{
-              x: "-50%",
-              y: "50%",
-              bottom: "25%",
-              left: "50%",  // 将left修改为50%，确保与中间线条对齐
+        <MotionConfig
+            transition={{
+                duration: 0.5,
+                ease: "easeInOut",
             }}
-          />
-        </motion.button>
-      </MotionConfig>
+        >
+            <motion.button
+                initial={false}
+                animate={active ? "open" : "closed"}
+                onClick={() => setActive((pv) => !pv)}
+                className="relative h-8 w-8 transition-colors hover:bg-white/20"
+            >
+                <motion.span
+                    variants={VARIANTS.top}
+                    className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+                    style={{ y: "-50%", left: "50%", x: "-50%", top: "25%" }}
+                />
+                <motion.span
+                    variants={VARIANTS.middle}
+                    className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+                    style={{ left: "50%", x: "-50%", top: "50%", y: "-50%" }}
+                />
+                <motion.span
+                    variants={VARIANTS.bottom}
+                    className="absolute h-1 w-6 bg-zinc-800 rounded-full"  // 维持1单位的高度
+                    style={{
+                        x: "-50%",
+                        y: "50%",
+                        bottom: "25%",
+                        left: "50%",  // 将left修改为50%，确保与中间线条对齐
+                    }}
+                />
+            </motion.button>
+        </MotionConfig>
     );
 };
 
 
-  
+
 const VARIANTS = {
     top: {
-      open: {
-        rotate: ["0deg", "0deg", "45deg"],
-        top: ["25%", "50%", "50%"],
-      },
-      closed: {
-        rotate: ["45deg", "0deg", "0deg"],
-        top: ["50%", "50%", "25%"],
-      },
+        open: {
+            rotate: ["0deg", "0deg", "45deg"],
+            top: ["25%", "50%", "50%"],
+        },
+        closed: {
+            rotate: ["45deg", "0deg", "0deg"],
+            top: ["50%", "50%", "25%"],
+        },
     },
     middle: {
-      open: {
-        rotate: ["0deg", "0deg", "-45deg"],
-      },
-      closed: {
-        rotate: ["-45deg", "0deg", "0deg"],
-      },
+        open: {
+            rotate: ["0deg", "0deg", "-45deg"],
+        },
+        closed: {
+            rotate: ["-45deg", "0deg", "0deg"],
+        },
     },
     bottom: {
-      open: {
-        rotate: ["0deg", "0deg", "45deg"],
-        bottom: ["25%", "50%", "50%"],
-        left: "50%",  // 在打开状态下对齐
-      },
-      closed: {
-        rotate: ["45deg", "0deg", "0deg"],
-        bottom: ["50%", "50%", "25%"],
-        left: "50%",  // 确保在关闭状态下与其他线条完美对齐
-      },
+        open: {
+            rotate: ["0deg", "0deg", "45deg"],
+            bottom: ["25%", "50%", "50%"],
+            left: "50%",  // 在打开状态下对齐
+        },
+        closed: {
+            rotate: ["45deg", "0deg", "0deg"],
+            bottom: ["50%", "50%", "25%"],
+            left: "50%",  // 确保在关闭状态下与其他线条完美对齐
+        },
     },
-  };
+};
 
-  
-  
+
+
 
 export default function SideBar() {
     const [open, setOpen] = useState(false);
@@ -124,19 +124,19 @@ export default function SideBar() {
         { name: "歷程", index: 5 }
     ];
     const [selected, setSelected] = useState(0);
-        // Handle socket event
-        useEffect(() => {
-            const handleRefreshKanban = (newStages) => {
-                location.reload()
-            };
-            socket.connect();
-            socket.on('refreshKanban', handleRefreshKanban);
-    
-            return () => {
-                // socket.disconnect();
-                socket.off('refreshKanban', handleRefreshKanban);
-            };
-        }, []);
+    // Handle socket event
+    // useEffect(() => {
+    //     const handleRefreshKanban = (newStages) => {
+    //         location.reload()
+    //     };
+    //     // socket.connect();
+    //     socket.on('refreshKanban', handleRefreshKanban);
+
+    //     return () => {
+    //         // socket.disconnect();
+    //         socket.off('refreshKanban', handleRefreshKanban);
+    //     };
+    // }, []);
 
     // const getStageColor = (stageIndex) => parseInt(currentStage) === stageIndex ? '#5BA491' : '#BEBEBE';
     const getStageColor = (stageIndex) => {
@@ -160,7 +160,7 @@ export default function SideBar() {
     };
 
     const NavItem = ({ children, selected, id, setSelected }) => {
-        
+
         return (
             <motion.button
                 className="hover:bg-slate-200 transition-colors relative"
@@ -234,7 +234,7 @@ export default function SideBar() {
                                 <div className='ml-1'>
                                     <BsChatDots size={"26"} className={"text-white"} />
                                 </div>
-                                <h2  className={`whitespace-pre text-sm  ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
+                                <h2 className={`whitespace-pre text-sm  ${!open && "opacity-0 translate-x-28 overflow-hidden"} text-white `}>
                                     聊天室
                                 </h2>
                                 <h2 className={`${open && 'hidden'} absolute left-14 bg-white font-semibold text-sm whitespace-pre rounded-md drop-shadow-lg p-0 w-0  overflow-hidden `}>

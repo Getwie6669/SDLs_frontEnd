@@ -42,7 +42,6 @@ export default function TopBar() {
         localStorage.setItem('currentSubStage', data.currentSubStage)
         setCurrentStageIndex(data.currentStage)
         setCurrentSubStageIndex(data.currentSubStage)
-        console.log("FKFKFOKOK")
       },
       enabled: !!projectId
     }

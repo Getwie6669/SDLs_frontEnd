@@ -55,7 +55,7 @@ export default function Kanban() {
       socket.off('refreshKanban');
     };
   }, [socket, queryClient]);
-  
+
   const getSubStageQuery = useQuery("getSubStage", () => getSubStage({
     projectId: projectId,
     currentStage: localStorage.getItem("currentStage"),
@@ -74,6 +74,7 @@ export default function Kanban() {
     }
   );
 
+
   useEffect(() => {
     function KanbanUpdateEvent(data) {
       if (data) {
@@ -88,13 +89,15 @@ export default function Kanban() {
       }
     }
     socket.connect();
+    socket.emit("join_project", projectId); 
+
     socket.on("taskItems", KanbanUpdateEvent);
     socket.on("taskItem", KanbanUpdateEvent);
     socket.on("dragtaskItem", kanbanDragEvent);
     socket.on("columnOrderUpdated", kanbanDragEvent);
     socket.on("ColumnCreatedSuccess", KanbanUpdateEvent);
     socket.on("columnDeleted", KanbanUpdateEvent);
-    return () => {
+    return () => {    
       socket.off('taskItems', KanbanUpdateEvent);
       socket.off('taskItem', KanbanUpdateEvent);
       socket.off("dragtaskItem", kanbanDragEvent);
@@ -103,7 +106,7 @@ export default function Kanban() {
       socket.off('columnDeleted', KanbanUpdateEvent);
 
     };
-  }, [socket]);
+  }, [socket, projectId]);
 
   useEffect(() => {
     if (!currentStage || !currentSubStage) {
@@ -129,14 +132,15 @@ export default function Kanban() {
       setKanbanData(newKanbanData);
       socket.emit('columnOrderChanged', {
         kanbanData: newKanbanData,
-        kanbanId: projectId
+        kanbanId: projectId,
       });
 
     } else if (type === 'CARD') {
       socket.emit('cardItemDragged', {
         destination,
         source,
-        kanbanData
+        kanbanData,
+        projectId
       })
 
     }
@@ -161,7 +165,8 @@ export default function Kanban() {
       socket.emit("taskItemCreated", {
         selectedcolumn,
         item,
-        kanbanData
+        kanbanData,
+        projectId
       });
       setShowForm(false);
       setNewCard("");

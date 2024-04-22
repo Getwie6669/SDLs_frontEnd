@@ -26,7 +26,7 @@ export default function IdeaWall() {
     const [updateNodeModalOpen, setUpdateNodeModalOpen] = useState(false);
     const [canvasPosition, setCanvasPosition] = useState({});
     const [ideaWallInfo, setIdealWallInfo] = useState({ id: "1", name: "", type: "" })
-    const [selectNodeInfo, setSelectNodeInfo] = useState({ id: "", title: "", content: "", owner: "", createdAt: "", ideaWallId: "" });
+    const [selectNodeInfo, setSelectNodeInfo] = useState({ id: "", title: "", content: "", owner: "", createdAt: "", ideaWallId: "", projectId: projectId });
     const [buildOnNodeId, setBuildOnId] = useState("")
     const [tempid, setTempId] = useState("")
 
@@ -88,13 +88,15 @@ export default function IdeaWall() {
             }
         }
         socket.connect();
+        socket.emit("join_project", projectId);
+
         socket.on("nodeUpdated", nodeUpdateEvent);
         return () => {
             socket.off("nodeUpdated", nodeUpdateEvent);
 
             // socket.disconnect();
         }
-    }, [socket])
+    }, [socket, projectId])
 
     // vis network
     useEffect(() => {
@@ -150,7 +152,8 @@ export default function IdeaWall() {
             ideaWallId: ideaWallInfo.id,
             // owner: localStorage.getItem("account"),
             owner: localStorage.getItem("username"),
-            from_id: buildOnNodeId
+            from_id: buildOnNodeId,
+            projectId: projectId
         }));
         if (name === 'title') setTitle(value);
         if (name === 'content') setContent(value);
@@ -162,7 +165,8 @@ export default function IdeaWall() {
             ...prevData,
             [name]: value,
             ideaWallId: ideaWallInfo.id,
-            owner: localStorage.getItem("username")
+            owner: localStorage.getItem("username"),
+            projectId: projectId
         }));
     }
 

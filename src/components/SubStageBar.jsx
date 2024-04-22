@@ -161,9 +161,6 @@ export default function SubStageComponent() {
     useEffect(() => {
         const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
         setStages(isValidStageIndex ? stageInfo[currentStageIndex - 1] : []);
-        console.log("OKOKOKOK",currentStageIndex)
-        console.log("OKOKOKOK",currentSubStageIndex)
-
     }, [currentStageIndex,currentSubStageIndex, stageInfo]);
 
     const handleRobotClick = () => {
@@ -192,18 +189,18 @@ export default function SubStageComponent() {
     };
 
     // Handle socket event
-    useEffect(() => {
-        const handleRefreshKanban = (newStages) => {
-            location.reload()
-        };
-        socket.connect();
-        socket.on('refreshKanban', handleRefreshKanban);
+    // useEffect(() => {
+    //     const handleRefreshKanban = (newStages) => {
+    //         location.reload()
+    //     };
+    //     socket.connect();
+    //     socket.on('refreshKanban', handleRefreshKanban);
 
-        return () => {
-            // socket.disconnect();
-            socket.off('refreshKanban', handleRefreshKanban);
-        };
-    }, []);
+    //     return () => {
+    //         // socket.disconnect();
+    //         socket.off('refreshKanban', handleRefreshKanban);
+    //     };
+    // }, []);
 
     useEffect(() => {
         console.log("Updated currentStageIndex", currentStageIndex);
