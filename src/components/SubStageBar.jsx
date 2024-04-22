@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
+import { useParams } from 'react-router-dom'
+import { getProject } from '../api/project';
+
 import { socket } from '../utils/Socket';
 // import { useQuery } from 'react-query';
 import { Context } from '../context/context'
@@ -156,12 +160,15 @@ export default function SubStageComponent() {
     const [isHovered, setIsHovered] = useState(false);
     const [ignoreHover, setIgnoreHover] = useState(false); // 新增狀態
     const dialogRef = useRef();
+    const queryClient = useQueryClient();
+    const { projectId } = useParams();
 
     // Update stages based on the current stage index
     useEffect(() => {
         const isValidStageIndex = currentStageIndex > 0 && currentStageIndex <= stageInfo.length;
         setStages(isValidStageIndex ? stageInfo[currentStageIndex - 1] : []);
-    }, [currentStageIndex,currentSubStageIndex, stageInfo]);
+        console.log("currentSubStageIndexChanged", currentSubStageIndex)
+    }, [currentSubStageIndex]);
 
     const handleRobotClick = () => {
         document.body.style.overflow = 'hidden'; // 開啟DialogBox時禁止滾動
@@ -187,26 +194,36 @@ export default function SubStageComponent() {
             return 'text-slate-700'; // 其他阶段
         }
     };
-
+    const getProjectQuery = useQuery("getProject", () => getProject(projectId),
+        {
+            onSuccess: (data) => {
+                localStorage.setItem('currentStage', data.currentStage)
+                localStorage.setItem('currentSubStage', data.currentSubStage)
+                setCurrentStageIndex(data.currentStage)
+                setCurrentSubStageIndex(data.currentSubStage)
+            },
+            enabled: !!projectId
+        }
+    );
     // Handle socket event
-    // useEffect(() => {
-    //     const handleRefreshKanban = (newStages) => {
-    //         location.reload()
-    //     };
-    //     socket.connect();
-    //     socket.on('refreshKanban', handleRefreshKanban);
-
-    //     return () => {
-    //         // socket.disconnect();
-    //         socket.off('refreshKanban', handleRefreshKanban);
-    //     };
-    // }, []);
-
     useEffect(() => {
-        console.log("Updated currentStageIndex", currentStageIndex);
-        console.log("Updated currentSubStageIndex", currentSubStageIndex);
-        // 這裡可以根據更新後的狀態執行一些操作
-    }, [currentStageIndex, currentSubStageIndex]);
+        const handleRefreshKanban = (newStages) => {
+            queryClient.invalidateQueries('getProject');
+        };
+
+        socket.on('refreshKanban', handleRefreshKanban);
+
+        return () => {
+            // socket.disconnect();
+            // socket.off('refreshKanban', handleRefreshKanban);
+        };
+    }, []);
+
+    // useEffect(() => {
+    // console.log("Updated currentStageIndex", currentStageIndex);
+    // console.log("Updated currentSubStageIndex", currentSubStageIndex);
+    // 這裡可以根據更新後的狀態執行一些操作
+    // }, [currentStageIndex, currentSubStageIndex]);
 
     const handleCloseDialog = () => {
         document.body.style.overflow = ''; // 關閉DialogBox時恢復滾動

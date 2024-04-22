@@ -52,7 +52,7 @@ export default function Kanban() {
     });
 
     return () => {
-      socket.off('refreshKanban');
+      // socket.off('refreshKanban');
     };
   }, [socket, queryClient]);
 
