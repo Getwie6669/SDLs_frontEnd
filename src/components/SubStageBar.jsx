@@ -59,16 +59,21 @@ const DialogBox = ({ isOpen, onClose, onOptionSelect }) => {
         let charIndex = 0;
         const typeWriter = setInterval(() => {
             if (charIndex < dialogContent.length) {
-                setDisplayedContent((prev) => prev + dialogContent[charIndex - 1]);
+                const charToAdd = dialogContent[charIndex];
+                if (typeof charToAdd !== 'undefined') {  // 确保即将添加的字符不是 undefined
+                    setDisplayedContent((prev) => prev + charToAdd);
+                    // console.log("Adding:", charToAdd);  // 输出当前添加的字符，帮助诊断问题
+                } else {
+                    console.error("Attempted to add undefined character at index", charIndex);
+                }
                 charIndex++;
             } else {
                 clearInterval(typeWriter);
             }
         }, 50); // 每50毫秒添加一个字符
-
+    
         return () => clearInterval(typeWriter); // 清除定时器
     }, [dialogContent]); // 依赖于dialogContent的变化
-
 
     useEffect(() => {
         if (isOpen) {

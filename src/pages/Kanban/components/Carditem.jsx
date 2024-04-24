@@ -84,7 +84,18 @@ function Carditem({ data, index, columnIndex }) {
 
 
   }
-
+  const Tooltip = ({ children, content }) => {
+    return (
+      <div className='relative group'>
+        {children}
+        <div className='absolute  hidden group-hover:block'>
+          <div className='bg-gray-700 text-white text-xs rounded-lg py-1 px-2 whitespace-nowrap'>
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  };
   return (
     <>
       <Draggable draggableId={data.id.toString()} index={index}>
@@ -93,7 +104,7 @@ function Carditem({ data, index, columnIndex }) {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`item-container bg-white p-2 rounded-lg mb-2 w-full shadow-lg ${snapshot.isDragging ? "dragging" : ""}`}
+            className={`item-container  p-2 rounded-lg mb-2 w-full shadow-lg hover:skew-y-2 ${snapshot.isDragging ? "dragging bg-customgreen/90 text-white" : "bg-white"}`}
             style={{
               ...provided.draggableProps.style,
               // 添加额外的样式调整，如必要的偏移或其他
@@ -195,7 +206,11 @@ function Carditem({ data, index, columnIndex }) {
                     const imgIndex = parseInt(assignee.id) % 9;
                     const userImg = personImg[imgIndex];
                     return (
-                      <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" title={assignee.username} key={index} />
+                      <Tooltip children={""} content={`${assignee.username}`}>
+                        <div key={index} className="relative w-8 h-8 rounded-full shadow-xl">
+                          <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" key={index} />
+                        </div>
+                      </Tooltip>
                     )
                   })
                 }

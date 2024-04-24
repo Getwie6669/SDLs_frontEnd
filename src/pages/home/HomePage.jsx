@@ -30,7 +30,8 @@ export default function HomePage() {
   const [doneProjects, setDoneProjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);  // 用於記錄當前打開的Accordion索引
-
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
 
   const {
     isLoading,
@@ -136,6 +137,13 @@ export default function HomePage() {
   const handleChange = e => {
     const { name, value } = e.target;
     console.log(name, value)
+
+    if (name === 'projectName') {
+      setProjectName(value);
+    } else if (name === 'projectdescribe') {
+      setProjectDescription(value);
+    }
+
     setCreateProjectData(prev => ({
       ...prev,
       [name]: value,
@@ -149,6 +157,8 @@ export default function HomePage() {
       return;
     }
     mutate(createprojectData);
+    setProjectName("");
+    setProjectDescription("");
   }
 
   const handleChangeReferral_Code = e => {
@@ -219,7 +229,7 @@ export default function HomePage() {
   }, [projectData]);
 
   return (
-    <div className='min-w-full min-h-screen bg-gray-100 overflow-auto'>
+    <div className='min-w-full min-h-screen bg-gray-100 overflow-auto scrollbar-hidden'>
       <TopBar />
       <div className='flex flex-col my-10 px-10 md:px-20 py-10 w-full items-center'>
         <div className='flex flex-col w-full md:w-11/12 lg:w-3/4'>
@@ -229,7 +239,7 @@ export default function HomePage() {
             activeIndex={activeIndex}
             setActiveIndex={setActiveIndex}
           >
-            <div className='flex justify-start mb-4 mt-2'>
+            <div className='flex justify-start mb-4 mt-2 pl-4'>
               {/* <h2 className="text-lg font-bold mr-8 pt-5">進行中</h2> */}
               <button
                 onClick={() => setCreateProjectModalOpen(true)}
@@ -244,11 +254,11 @@ export default function HomePage() {
                 <MdAddchart className="mr-2" /> 加入活動
               </button>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 '>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 place-items-center'>
               {ongoingProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
                 <div key={index} className='bg-white w-96 rounded-lg shadow-lg hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
                   <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
-                  <p className='text-gray-600 font-semibold'>{projectItem.describe}</p>
+                  <p className='text-gray-600 font-semibold truncate overflow-hidden h-6 '>{projectItem.describe}</p>
                   <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
                   <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
                   <div className='flex justify-between text-sm text-gray-500'>
@@ -282,7 +292,7 @@ export default function HomePage() {
             setActiveIndex={setActiveIndex}
           >
             {/* <h2 className="text-lg font-bold mb-4 mt-10">已完成</h2> */}
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 place-items-center'>
               {completedProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
                 <div key={index} className='bg-white w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
                   <div className='flex items-center'>
@@ -318,7 +328,7 @@ export default function HomePage() {
             activeIndex={activeIndex}
             setActiveIndex={setActiveIndex}
           >
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 place-items-center'>
               {doneProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
                 <div key={index} className='bg-gray-300 w-96 rounded-lg shadow hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
                   <div className='flex items-center justify-between'>
@@ -369,6 +379,7 @@ export default function HomePage() {
             placeholder="專案名稱..."
             name='projectName'
             onChange={handleChange}
+            value={projectName}
             required
           />
           <p className=' font-bold text-base mb-3'>專案描述</p>
@@ -377,6 +388,7 @@ export default function HomePage() {
             placeholder="描述名稱"
             name='projectdescribe'
             onChange={handleChange}
+            value={projectDescription}
           />
           <div className="mt-4">
             <label className="block text-gray-700 text-base">指導老師</label>
@@ -433,7 +445,7 @@ export default function HomePage() {
 
         </div>
       </Modal>
-      {/* <Toaster /> */}
+      <Toaster />
     </div>
   )
 }

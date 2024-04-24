@@ -25,7 +25,7 @@ export default function TopBar() {
   ];
   const [reloadPage, setReloadPage] = useState(false); // 新增狀態
 
-  const { currentStageIndex, setCurrentStageIndex,currentSubStageIndex, setCurrentSubStageIndex} = useContext(Context)
+  const { currentStageIndex, setCurrentStageIndex, currentSubStageIndex, setCurrentSubStageIndex } = useContext(Context)
 
   const getProjectUserQuery = useQuery("getProjectUser", () => getProjectUser(projectId),
     {
@@ -75,6 +75,18 @@ export default function TopBar() {
 
 
   }
+  const Tooltip = ({ children, content }) => {
+    return (
+      <div className='relative group'>
+        {children}
+        <div className='absolute  hidden group-hover:block'>
+          <div className='bg-gray-700 text-white text-xs rounded-lg py-1 px-2 whitespace-nowrap'>
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (location.pathname === "/homepage") {
     return (
@@ -96,10 +108,15 @@ export default function TopBar() {
 
   return (
     <div className='fixed z-40 h-16 w-full bg-[#FFFFFF] flex items-center justify-between pr-5 border-b-2'>
-      <Link to="/homepage" onClick={cleanStage} className="flex px-5 items-center font-bold font-Mulish text-2xl">
-        <img src="/SDLS_LOGOO.jpg" alt="Logo" className=" h-14 w-auto" />
 
-      </Link>
+      <div className='flex items-center'>
+        <Link to="/homepage" onClick={cleanStage} className="flex px-5 items-center font-bold font-Mulish text-2xl">
+          <img src="/SDLS_LOGOO.jpg" alt="Logo" className=" h-14 w-auto" />
+        </Link>
+        <p className=' font-bold text-xl text-teal-900'>
+          {projectInfo.name}
+        </p>
+      </div>
       <div className="flex items-center">
         <ul className="flex items-center justify-center space-x-1">
           {getProjectUserQuery.isLoading || projectId === undefined ? <></> :
@@ -108,9 +125,15 @@ export default function TopBar() {
                 const imgIndex = parseInt(projectUser.id) % 9;
                 const userImg = personImg[imgIndex];
                 return (
-                  <li key={index} className="w-8 h-8 overflow-hidden rounded-full shadow-xl ">
-                    <img src={userImg} alt="Person" className="w-full h-full object-cover" title={projectUser.username} />
+                  <Tooltip children={""} content={`${projectUser.username}`}>
+                    <li key={index} className="relative w-8 h-8 rounded-full shadow-xl">
+                    <img src={userImg} alt="Person" className="w-full h-full object-cover" />
+                    {/* <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 duration-500 ease-in-out bg-customgreen text-white text-xs font-bold rounded-md shadow-lg px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {projectUser.username}
+                    </span> */}
                   </li>
+                  </Tooltip>
+                  
                 )
               })
           }

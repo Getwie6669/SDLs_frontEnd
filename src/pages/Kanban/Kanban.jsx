@@ -89,7 +89,7 @@ export default function Kanban() {
       }
     }
     socket.connect();
-    socket.emit("join_project", projectId); 
+    socket.emit("join_project", projectId);
 
     socket.on("taskItems", KanbanUpdateEvent);
     socket.on("taskItem", KanbanUpdateEvent);
@@ -97,7 +97,7 @@ export default function Kanban() {
     socket.on("columnOrderUpdated", kanbanDragEvent);
     socket.on("ColumnCreatedSuccess", KanbanUpdateEvent);
     socket.on("columnDeleted", KanbanUpdateEvent);
-    return () => {    
+    return () => {
       socket.off('taskItems', KanbanUpdateEvent);
       socket.off('taskItem', KanbanUpdateEvent);
       socket.off("dragtaskItem", kanbanDragEvent);
@@ -235,7 +235,7 @@ export default function Kanban() {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex space-x-4 overflow-x-auto " // 添加 overflow-x-auto 以启用水平滚动
+                className="flex space-x-4 overflow-x-auto h-[calc(100vh-12rem)] scrollbar-none overflow-y-hidden" // 添加 overflow-x-auto 以启用水平滚动
                 style={{ display: 'inline-flex', flexDirection: 'row', paddingBottom: '1rem' }} // 确保列是水平排列的，并且底部有足够空间
               >
                 {!showAddGroupInput && (
@@ -287,7 +287,7 @@ export default function Kanban() {
                             <div
                               {...provided.draggableProps}
                               ref={provided.innerRef}
-                              className="group-container w-60 bg-slate-50 rounded-lg shadow-lg"
+                              className="group-container w-60 h-fit bg-slate-50 rounded-lg shadow-lg"
                             >
                               <div
                                 {...provided.dragHandleProps}
@@ -306,9 +306,10 @@ export default function Kanban() {
                               </div>
                               {
                                 <Droppable droppableId={columnIndex.toString()} type='CARD'>
-                                  {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="flex flex-col px-4 pb-1">
+                                  {(provided,snapshot) => (
+                                    <div {...provided.droppableProps} ref={provided.innerRef}  >
+                                      <div className={`flex flex-col px-4 pb-1 overflow-y-auto max-h-[calc(100vh-21rem)] roun scrollbar-thin ${snapshot.isDraggingOver ? 'bg-customgreen/10' : 'bg-slate-50'}`}>
+
                                         <div className="items-container">
                                           {column.task.length > 0 &&
                                             column.task.map((item, index) => (
@@ -325,10 +326,11 @@ export default function Kanban() {
                                     </div>
                                   )}
                                 </Droppable>
+
                               }
                               {
                                 showForm && selectedcolumn === columnIndex ? (
-                                  <div className='flex flex-col store-container rounded-lg mb-2 px-4'>
+                                  <div className='flex flex-col store-container rounded-lg mb-2 px-4 pt-1'>
                                     <input
                                       className='text-sm border border-gray-300 p-2 w-52 rounded-md mb-2'
                                       rows={3}
@@ -353,7 +355,7 @@ export default function Kanban() {
                                   </div>
 
                                 ) : (
-                                  <div className="flex justify-start px-4">
+                                  <div className="flex justify-start px-4 pt-1">
                                     <button
                                       onClick={() => { setSelectedcolumn(columnIndex); setShowForm(true); }}
                                       className="bg-[#5BA491] hover:bg-[#5BA491]/80 text-sm p-2 mb-2 text-white font-bold py-1 px-4 rounded transition ease-in-out duration-300"
