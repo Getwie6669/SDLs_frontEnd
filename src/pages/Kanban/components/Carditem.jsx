@@ -12,6 +12,7 @@ import { AiOutlineTag } from "react-icons/ai";
 import { BsFillPersonFill } from "react-icons/bs";
 import { Draggable } from 'react-beautiful-dnd';
 import { socket } from '../../../utils/Socket';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 function Carditem({ data, index, columnIndex }) {
@@ -61,8 +62,13 @@ function Carditem({ data, index, columnIndex }) {
     }));
   }
   const cardHandleSubmit = () => {
-    socket.emit("cardUpdated", { cardData, columnIndex, index, projectId });
-    setOpen(false);
+
+    if (cardData.title.trim() !== "") {
+      socket.emit("cardUpdated", { cardData, columnIndex, index, projectId });
+      setOpen(false);
+    } else {
+      toast.error("請填寫卡片標題!");
+    }
   }
   const cardHandleDelete = () => {
 
@@ -206,8 +212,8 @@ function Carditem({ data, index, columnIndex }) {
                     const imgIndex = parseInt(assignee.id) % 9;
                     const userImg = personImg[imgIndex];
                     return (
-                      <Tooltip children={""} content={`${assignee.username}`}>
-                        <div key={index} className="relative w-8 h-8 rounded-full shadow-xl">
+                      <Tooltip key={index} children={""} content={`${assignee.username}`}>
+                        <div className="relative w-8 h-8 rounded-full shadow-xl">
                           <img src={userImg} alt="Person" className="w-8 h-8  overflow-hidden rounded-full shadow-xl object-cover" key={index} />
                         </div>
                       </Tooltip>
@@ -256,6 +262,7 @@ function Carditem({ data, index, columnIndex }) {
           <AssignMember menberData={menberData} setMenberData={setMenberData} setCardData={setCardData} cardHandleSubmit={cardHandleSubmit} />
         </Modal>
       }
+      <Toaster />
     </>
   )
 }

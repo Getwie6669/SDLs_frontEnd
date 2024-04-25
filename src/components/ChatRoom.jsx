@@ -135,8 +135,8 @@ export default function ChatRoom({ chatRoomOpen, setChatRoomOpen }) {
 
                     const today = new Date();
                     const todayString = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
-                    console.log("todayString", todayString)
-                    console.log("dateString", dateString)
+                    // console.log("todayString", todayString)
+                    // console.log("dateString", dateString)
                     const isNewDay = acc.lastDate !== dateString;
                     const imgIndex = parseInt(messages.userId) % 9;
                     const currentImgIndex = parseInt(messages.creator) % 9;

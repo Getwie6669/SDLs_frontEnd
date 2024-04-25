@@ -125,8 +125,8 @@ export default function TopBar() {
                 const imgIndex = parseInt(projectUser.id) % 9;
                 const userImg = personImg[imgIndex];
                 return (
-                  <Tooltip children={""} content={`${projectUser.username}`}>
-                    <li key={index} className="relative w-8 h-8 rounded-full shadow-xl">
+                  <Tooltip key={index} children={""} content={`${projectUser.username}`}>
+                    <li  className="relative w-8 h-8 rounded-full shadow-xl">
                     <img src={userImg} alt="Person" className="w-full h-full object-cover" />
                     {/* <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 duration-500 ease-in-out bg-customgreen text-white text-xs font-bold rounded-md shadow-lg px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {projectUser.username}

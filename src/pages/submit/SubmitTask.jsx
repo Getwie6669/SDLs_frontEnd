@@ -72,6 +72,20 @@ export default function SubmitTask() {
     }
 
     const handleSubmit = e => {
+        e.preventDefault();  // 阻止表单默认行为
+        let allFieldsFilled = true;
+        for (const [key, type] of Object.entries(stageInfo.userSubmit)) {
+            if (type !== "file" && (!taskData[key] || taskData[key].trim() === "")) {
+                allFieldsFilled = false;
+                break;
+            }
+        }
+        if (!allFieldsFilled) {
+            // 如果有未填写的字段，显示错误消息并返回
+            toast.error("請確認所有欄位皆填寫完整!");
+            return;
+        }
+    
         Swal.fire({
             title: "上傳",
             text: "確認紀錄當前階段成果?",

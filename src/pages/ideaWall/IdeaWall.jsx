@@ -11,6 +11,7 @@ import { getIdeaWall } from '../../api/ideaWall';
 import { getNodes, getNodeRelation } from '../../api/nodes';
 import { socket } from '../../utils/Socket';
 import SideBar from '../../components/SideBar';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 export default function IdeaWall() {
@@ -29,6 +30,7 @@ export default function IdeaWall() {
     const [selectNodeInfo, setSelectNodeInfo] = useState({ id: "", title: "", content: "", owner: "", createdAt: "", ideaWallId: "", projectId: projectId });
     const [buildOnNodeId, setBuildOnId] = useState("")
     const [tempid, setTempId] = useState("")
+    const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -172,14 +174,22 @@ export default function IdeaWall() {
 
     const handleCreateSubmit = (e) => {
         e.preventDefault()
-        setCreateNodeModalOpen(false)
-        socket.emit('nodeCreate', nodeData)
-        setBuildOnId("")
+        if (title.trim() !== "" && content.trim() !== "") {
+            setCreateNodeModalOpen(false);
+            socket.emit('nodeCreate', nodeData);
+            setBuildOnId("");
+        } else {
+            toast.error("標題及內容請填寫完整!");
+        }
     }
     const handleUpdateSubmit = (e) => {
         e.preventDefault()
-        setUpdateNodeModalOpen(false)
-        socket.emit('nodeUpdate', selectNodeInfo)
+        if (selectNodeInfo.title.trim() !== "" && selectNodeInfo.content.trim() !== "") {
+            setUpdateNodeModalOpen(false)
+            socket.emit('nodeUpdate', selectNodeInfo)
+        } else {
+            toast.error("標題及內容請填寫完整!");
+        }
     }
 
     const handleDelete = (e) => {
@@ -189,19 +199,16 @@ export default function IdeaWall() {
 
     }
 
-
+    const getProjectUserQuery = useQuery("getProjectUser", () => getProjectUser(projectId),
+        {
+            onSuccess: setProjectUsers,
+            enabled: !!projectId
+        }
+    );
 
     return (
         <div>
-            {/* <SideBar />
-            <TopBar /> */}
-            {/* <TopBar />
-            <IdeaWallSideBar /> */}
-            {
-                //to do ? :
-                <div ref={container} className=' h-screen w-full pl-[70px] pt-[70px]' />
-
-            }
+            <div ref={container} className=' h-screen w-full pl-[70px] pt-[70px]' />
             {/* create option */}
             <Modal open={createOptionModalOpen} onClose={() => setCreateOptionModalOpen(false)} opacity={false} modalCoordinate={canvasPosition} custom={"w-25 h-12"}>
                 <div>
@@ -317,6 +324,7 @@ export default function IdeaWall() {
                     }
                 </Modal>
             }
+            <Toaster />
         </div>
     )
 }

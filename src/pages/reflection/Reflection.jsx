@@ -28,6 +28,8 @@ export default function Reflection() {
     const [teamDailyModalOpen, setTeamDailyModalOpen] = useState(false);
     const queryClient = useQueryClient();
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
 
     const toggleTooltip = () => {
         setIsTooltipVisible(!isTooltipVisible);
@@ -56,7 +58,7 @@ export default function Reflection() {
                 setShowEmptyMessage(true);
             }
 
-        },20); // 延迟500毫秒显示空状态消息
+        }, 20); // 延迟500毫秒显示空状态消息
 
         return () => clearTimeout(timer);
     }, [personalDaily.length, teamDaily.length, isLoading, isError]);
@@ -99,24 +101,32 @@ export default function Reflection() {
             [name]: value,
             userId: localStorage.getItem("id")
         }));
+        if (name === 'title') setTitle(value);
+        if (name === 'content') setContent(value);
     }
     const handleAddFileChange = e => {
         setAttachFile(e.target.files);
     }
     const handleCreatePersonalDaily = e => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('projectId', projectId);
-        if (attachFile) {
-            for (let i = 0; i < attachFile.length; i++) {
-                formData.append("attachFile", attachFile[i])
+        if (title.trim() !== "" && content.trim() !== "") {
+            const formData = new FormData();
+            formData.append('projectId', projectId);
+            if (attachFile) {
+                for (let i = 0; i < attachFile.length; i++) {
+                    formData.append("attachFile", attachFile[i])
+                }
             }
+            for (let key in dailyData) {
+                formData.append(key, dailyData[key]);
+            }
+            console.log(...formData);
+            mutate(formData);
+            setPersonalDailyModalOpen(false);
+        } else {
+            toast.error("標題及內容請填寫完整!");
         }
-        for (let key in dailyData) {
-            formData.append(key, dailyData[key]);
-        }
-        console.log(...formData);
-        mutate(formData);
+
     }
     const handleChangeSelectDaily = e => {
         const { name, value } = e.target;
@@ -137,18 +147,27 @@ export default function Reflection() {
 
     const handleCreateTeamDaily = e => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('projectId', projectId);
-        if (attachFile) {
-            for (let i = 0; i < attachFile.length; i++) {
-                formData.append("attachFile", attachFile[i])
+
+        if (title.trim() !== "" && content.trim() !== "") {
+            const formData = new FormData();
+            formData.append('projectId', projectId);
+            if (attachFile) {
+                for (let i = 0; i < attachFile.length; i++) {
+                    formData.append("attachFile", attachFile[i])
+                }
             }
+            for (let key in dailyData) {
+                formData.append(key, dailyData[key]);
+            }
+            console.log(...formData);
+            teamDailyMutate(formData);
+            setTeamDailyModalOpen(false);
+
+        } else {
+            toast.error("標題及內容請填寫完整!");
         }
-        for (let key in dailyData) {
-            formData.append(key, dailyData[key]);
-        }
-        console.log(...formData);
-        teamDailyMutate(formData);
+
+
     }
 
     const errorNotify = (toastContent) => toast.error(toastContent);
@@ -176,7 +195,11 @@ export default function Reflection() {
             <div className='flex flex-col my-5 pl-20 pr-5 py-16 w-full h-screen justify-start items-start'>
                 <div className='flex justify-start gap-6 items-center w-full'>
                     <h3 className='text-lg font-bold'>個人日誌</h3>
-                    <button onClick={() => setPersonalDailyModalOpen(true)} className="flex items-center bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-lg p-1 mr-1 sm:px-4 text-base min-w-[70px]">
+                    <button onClick={() => {
+                        setTitle("")
+                        setContent("")
+                        setPersonalDailyModalOpen(true)
+                    }} className="flex items-center bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-lg p-1 mr-1 sm:px-4 text-base min-w-[70px]">
                         <FaPlus />
                         <p className="ml-2">新增</p>
                     </button>
@@ -213,6 +236,8 @@ export default function Reflection() {
                 <div className='flex justify-start gap-6 items-center w-full'>
                     <h3 className='text-lg font-bold'>小組日誌</h3>
                     <button onClick={() => {
+                        setTitle("")
+                        setContent("")
                         setTeamDailyModalOpen(true)
                         setDailyData(prev => ({
                             ...prev,
@@ -231,11 +256,11 @@ export default function Reflection() {
 
                                     teamDaily.length === 0 ? (
                                         showEmptyMessage && (
-                                        <div className="flex flex-col items-center justify-center mx-80">
-                                            <Lottie className=" w-72" animationData={personalDailyIcon} />
-                                            <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
-                                        </div>
-                                    )) : (
+                                            <div className="flex flex-col items-center justify-center mx-80">
+                                                <Lottie className=" w-72" animationData={personalDailyIcon} />
+                                                <p className=' font-bold text-zinc-600 text-lg'>還沒新增過小組日誌 ! 趕快新增你的第一個小組日誌吧 ~</p>
+                                            </div>
+                                        )) : (
                                         teamDaily.map((item, index) => {
                                             if (item.type === "discuss") {
                                                 return (
@@ -269,8 +294,8 @@ export default function Reflection() {
                         <p className='font-bold text-base'>日誌內容</p>
                         <button
                             onClick={toggleTooltip}
-                            className='ml-2 p-1 hover:bg-customgreen-dark'>
-                            <GrCircleQuestion className='w-4 h-4 text-white' />
+                            className='ml-2 p-1'>
+                            <GrCircleQuestion className='w-4 h-4 text-customgreen hover:text-customgreen/60' />
                         </button>
                     </div>
                     {isTooltipVisible && (
@@ -298,6 +323,7 @@ export default function Reflection() {
                         type="text"
                         placeholder="日誌名稱..."
                         name='title'
+                        value={title}
                         onChange={handleChange}
                         required
                     />
@@ -305,6 +331,7 @@ export default function Reflection() {
                         rows={10}
                         placeholder="撰寫您的日誌..."
                         name='content'
+                        value={content}
                         onChange={handleChange}
                     />
                     <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
@@ -320,8 +347,9 @@ export default function Reflection() {
                             取消
                         </button>
                         <button onClick={e => {
+
                             handleCreatePersonalDaily(e);
-                            setPersonalDailyModalOpen(false);
+
                         }}
                             type="submit"
                             className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
@@ -341,8 +369,8 @@ export default function Reflection() {
                         <p className='font-bold text-base'>日誌內容</p>
                         <button
                             onClick={toggleTooltip}
-                            className='ml-2 p-1 hover:bg-customgreen-dark'>
-                            <GrCircleQuestion className='w-4 h-4 text-white' />
+                            className='ml-2 p-1 '>
+                            <GrCircleQuestion className='w-4 h-4 text-customgreen hover:text-customgreen/60' />
                         </button>
                     </div>
                     {isTooltipVisible && (
@@ -370,6 +398,7 @@ export default function Reflection() {
                         type="text"
                         placeholder="日誌名稱..."
                         name='title'
+                        value={title}
                         onChange={handleChange}
                         required
                     />
@@ -377,6 +406,7 @@ export default function Reflection() {
                         rows={10}
                         placeholder="撰寫您的日誌..."
                         name='content'
+                        value={content}
                         onChange={handleChange}
                     />
                     <input className="rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
@@ -393,7 +423,6 @@ export default function Reflection() {
                         </button>
                         <button onClick={e => {
                             handleCreateTeamDaily(e);
-                            setTeamDailyModalOpen(false);
                         }}
                             type="submit"
                             className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">

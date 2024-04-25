@@ -68,6 +68,7 @@ export default function HomePage() {
     onSuccess: (res) => {
       console.log(res);
       queryClient.invalidateQueries("projectDatas")
+      setCreateProjectModalOpen(false);
       // sucesssReferralCodeNotify(res.message)
       Swal.fire({
         icon: 'success',
@@ -152,11 +153,11 @@ export default function HomePage() {
   }
 
   const handleCreateProject = () => {
-    if (createprojectData.projectMentor === "") {
-      toast.error("請選擇指導老師");
-      return;
-    }
     mutate(createprojectData);
+    // if (createprojectData.projectMentor === "") {
+    //   toast.error("請選擇指導老師");
+    //   return;
+    // }
     setProjectName("");
     setProjectDescription("");
   }
@@ -231,8 +232,8 @@ export default function HomePage() {
   return (
     <div className='min-w-full min-h-screen bg-gray-100 overflow-auto scrollbar-hidden'>
       <TopBar />
-      <div className='flex flex-col my-10 px-10 md:px-20 py-10 w-full items-center'>
-        <div className='flex flex-col w-full md:w-11/12 lg:w-3/4'>
+      <div className='flex flex-col my-10  md:px-10 lg:px-10 2xl:px-80 py-10 w-full items-center'>
+        <div className='flex flex-col w-full '>
           <Accordion
             index={0}
             title="進行中活動"
@@ -254,7 +255,7 @@ export default function HomePage() {
                 <MdAddchart className="mr-2" /> 加入活動
               </button>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 place-items-center'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  2xl:grid-cols-3 gap-4 place-items-center'>
               {ongoingProjects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((projectItem, index) => (
                 <div key={index} className='bg-white w-96 rounded-lg shadow-lg hover:shadow-lg  p-4 flex flex-col space-y-4 hover:scale-105 transition-transform duration-200 ease-out'>
                   <h3 className='text-xl font-bold text-[#5BA491]'>{projectItem.name}</h3>
@@ -301,7 +302,7 @@ export default function HomePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className='text-gray-600 font-semibold'>{projectItem.describe}</p>
+                  <p className='text-gray-600 font-semibold truncate overflow-hidden h-6 '>{projectItem.describe}</p>
                   <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
                   <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
                   <div className='flex justify-between text-sm text-gray-500'>
@@ -343,7 +344,7 @@ export default function HomePage() {
                     </button>
                   </div>
 
-                  <p className='text-gray-600 font-semibold'>{projectItem.describe}</p>
+                  <p className='text-gray-600 font-semibold truncate overflow-hidden h-6 '>{projectItem.describe}</p>
                   <div className='text-sm text-gray-500'>指導老師：{projectItem.mentor}</div>
                   <div className='text-sm text-gray-500'>邀請碼：{projectItem.referral_code}</div>
                   <div className='flex justify-between text-sm text-gray-500'>
@@ -408,7 +409,6 @@ export default function HomePage() {
           </button>
           <button onClick={() => {
             handleCreateProject();
-            setCreateProjectModalOpen(false);
           }}
             type="submit"
             className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
