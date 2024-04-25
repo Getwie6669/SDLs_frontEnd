@@ -138,7 +138,7 @@ export default function TopBar() {
               })
           }
           <li>
-            <button className="p-1 rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button className="p-1 rounded-md text-gray-500 hover:text-gray-900 ">
               <BsPlusCircleDotted size={32} onClick={() => setReferralCodeModalOpen(true)} />
             </button>
           </li>

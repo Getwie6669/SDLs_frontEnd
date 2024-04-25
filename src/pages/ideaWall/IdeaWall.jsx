@@ -34,6 +34,10 @@ export default function IdeaWall() {
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const userId = localStorage.getItem("id");
+    const colors = [
+        "#5BA491", "#26547C", "#F25757", "#AF7A6D", "#183446", "#9395D3","#FF6542","#78290F","#DEA47E","#9DACFF","#2F3061", "#FFD166"
+      ];
 
     const ideaWallInfoQuery = useQuery(
         'ideaWallInfo',
@@ -71,14 +75,16 @@ export default function IdeaWall() {
     // convert node to svg
     useEffect(() => {
         const temp = [];
-        nodes.map(item => {
-            // item.image = svgConvertUrl(item.title, selectNodeInfo.owner, item.createdAt);
-            item.image = svgConvertUrl(item.title, item.owner, item.createdAt);
-
-            item.shape = "image";
-            temp.push(item);
-        })
-    }, [nodes])
+        nodes.map((item) => {
+          const nodeColor = colors[item.colorindex-1 % colors.length]; // Use modulo to cycle through colors if index exceeds array length
+    
+          item.image = svgConvertUrl(item.title,item.owner,item.createdAt,nodeColor );
+    
+    
+          item.shape = "image";
+          temp.push(item);
+        });
+      }, [nodes]);
 
     // socket
     useEffect(() => {
@@ -147,30 +153,37 @@ export default function IdeaWall() {
     }, [container, nodes, edges]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target
-        setNodeData(prevData => ({
-            ...prevData,
-            [name]: value,
-            ideaWallId: ideaWallInfo.id,
-            // owner: localStorage.getItem("account"),
-            owner: localStorage.getItem("username"),
-            from_id: buildOnNodeId,
-            projectId: projectId
+        const { name, value } = e.target;
+    
+        if (name === "title") {
+          setTitle(value);
+        } else if (name === "content") {
+          setContent(value);
+        }
+    
+    
+        setNodeData((prevData) => ({
+          ...prevData,
+          [name]: value,
+          ideaWallId: ideaWallInfo.id,
+          owner: localStorage.getItem("username"),
+          from_id: buildOnNodeId,
+          projectId:projectId,
+          colorindex:userId
         }));
-        if (name === 'title') setTitle(value);
-        if (name === 'content') setContent(value);
-    }
+      };
 
     const handleUpdataChange = (e) => {
-        const { name, value } = e.target
-        setSelectNodeInfo(prevData => ({
-            ...prevData,
-            [name]: value,
-            ideaWallId: ideaWallInfo.id,
-            owner: localStorage.getItem("username"),
-            projectId: projectId
+        const { name, value } = e.target;
+        setSelectNodeInfo((prevData) => ({
+          ...prevData,
+          [name]: value,
+          ideaWallId: ideaWallInfo.id,
+          owner: localStorage.getItem("username"),
+          projectId:projectId,
+          colorindex:userId
         }));
-    }
+      };
 
     const handleCreateSubmit = (e) => {
         e.preventDefault()
@@ -199,12 +212,6 @@ export default function IdeaWall() {
 
     }
 
-    const getProjectUserQuery = useQuery("getProjectUser", () => getProjectUser(projectId),
-        {
-            onSuccess: setProjectUsers,
-            enabled: !!projectId
-        }
-    );
 
     return (
         <div>

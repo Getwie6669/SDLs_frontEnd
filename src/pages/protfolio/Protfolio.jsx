@@ -23,6 +23,9 @@ export default function Protfolio() {
     const [activeItemId, setActiveItemId] = useState(null); // 新增状态以追踪当前被点击的项目 ID
     const [showEmptyMessage, setShowEmptyMessage] = useState(false);
     let portfolioItemsWithTitles = [];
+
+
+    
     const {
         isLoading,
         isError,
@@ -41,7 +44,7 @@ export default function Protfolio() {
         if (portfolioItemsWithTitles.length === 0 && !isLoading && !isError) {
           setShowEmptyMessage(true);
         }
-      }, 20); // 延迟500毫秒显示空状态消息
+      }, 500); // 延迟500毫秒显示空状态消息
     
       return () => clearTimeout(timer);
     }, [portfolioItemsWithTitles.length, isLoading, isError]);
